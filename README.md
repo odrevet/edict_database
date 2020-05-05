@@ -1,6 +1,6 @@
 # setup
 
-SQL in generated using scripts written in `dart`.
+SQL is generated using scripts written in `dart`.
 
 Download required packages with
 
