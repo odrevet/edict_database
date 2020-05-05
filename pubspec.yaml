@@ -1,0 +1,8 @@
+name: edict_database
+description: convert edict xml to sql
+version: 0.0.1
+
+environment:
+  sdk: '>=2.7.0'
+dependencies:
+  xml: ^4.1.0
