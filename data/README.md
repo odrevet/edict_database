@@ -6,7 +6,7 @@ JMDict and kanjidict2.xml files are respectivly the JMDict dictionary and the ka
 
 This is from these two file that we will generate the sql and db files.
 
-They are not shipped by default with our project, instead we will use the `utils/get_jmdict.sh` and `utils get_kanjidic2.sh` util script to download and decompress these files.
+They are not shipped by default with our project, instead we will use the `src/expression/get_jmdict.sh` and `src/kanji/ get_kanjidic2.sh` scripts to download and decompress these files.
 
 # radkfile.json file
 
