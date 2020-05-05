@@ -27,6 +27,8 @@ Scripts needs to be called from the projet's root
     bash src/expression/get_jmdict.sh
     bash src/kanji/get_kanjidic2.sh
 
+Please note that for some reason the doctype (from <!DOCTYPE kanjidic2 [ to ]> )of kanjidic2.xml cannot be parsed to generate SQL and must be remove before calling create_sql.sh.
+
 ## 2. Init db
 
 To create the data/generated/db/expression.db file
