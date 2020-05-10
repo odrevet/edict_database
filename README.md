@@ -79,7 +79,7 @@ call delete_db.sh then init_db.sh
 
 # Documentation
 
-For more informations onto the database structure see the database.md file.
+For more informations onto the database structure and SQL reicips see the Wiki at https://github.com/odrevet/edict_database/wiki
 
 # Licencing
 
