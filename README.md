@@ -83,6 +83,8 @@ For more informations onto the database structure and SQL reicips see the Wiki a
 
 # Licencing
 
+the edict_database project is not affiliated with the edict project. 
+
 The source code in the src folder is licenced under the MIT license
 
 The generated sql and db files are licenced under the edrdg license, same as the edict dictionary.
