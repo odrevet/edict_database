@@ -1,15 +1,28 @@
 # setup
 
-SQL is generated using scripts written in `dart`.
+## Dart SDK 
+
+SQL is generated using scripts written in `dart`; 
+
+## Dart packages
 
 Download required packages with
 
 	pub get
 
 
+## Utils required binaries
+
 `bash` scripts are in the `src` directory to download dictionaries with `wget` and uncompressed them with `gunzip`.
 
-sqlite db files are created and populated using the `sqlite3` binary.
+
+## Generate .db 
+
+sqlite3 db files are created and populated using the `sqlite3` binary.
+
+```
+sudo apt install sqlite3
+```
 
 # src scripts
 
@@ -27,21 +40,13 @@ Scripts needs to be called from the projet's root
     bash src/expression/get_jmdict.sh
     bash src/kanji/get_kanjidic2.sh
 
+Will download dictionary files into the `data` directory. 
+
 Please note that for some reason the doctype (from <!DOCTYPE kanjidic2 [ to ]> )of kanjidic2.xml cannot be parsed to generate SQL and must be remove before calling create_sql.sh.
 
-## 2. Init db
+## 2. Create sql
 
-To create the data/generated/db/expression.db file
-
-    bash src/init_db.sh expression
-
-To create the data/generated/db/kanji.db file
-
-	bash src/init_db.sh kanji
-
-## 3. Create sql
-
-To create the data/generated/sql/expression.sql file
+To create the `data/generated/sql/expression.sql` file
 
 	bash src/create_sql.sh expression
 
@@ -49,14 +54,26 @@ To create the data/generated/sql/kanji.sql file
 
 	bash src/create_sql.sh kanji
 
+## 3. Init db
+
+Create .db file  
+
+To create the `data/generated/db/expression.db` file
+
+    bash src/init_db.sh expression
+
+To create the `data/generated/db/kanji.db` file
+
+	bash src/init_db.sh kanji
+
 ## 4. Populate db from generated sql files
 
 
-To populate the data/generated/db/expression.db file
+To populate the `data/generated/db/expression.db` file
 
 	bash src/populate_db.sh expression
 
-To populate the data/generated/db/kanji.db file
+To populate the `data/generated/db/kanji.db` file
 
 	bash src/populate_db.sh kanji
 
