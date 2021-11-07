@@ -5,4 +5,4 @@ version: 0.0.1
 environment:
   sdk: '>=2.7.0'
 dependencies:
-  xml: ^4.1.0
+  xml: ^5.3.1
