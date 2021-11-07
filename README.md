@@ -50,7 +50,7 @@ To create the `data/generated/sql/expression.sql` file
 
 	bash src/create_sql.sh expression
 
-To create the data/generated/sql/kanji.sql file
+To create the `data/generated/sql/kanji.sql` file
 
 	bash src/create_sql.sh kanji
 
