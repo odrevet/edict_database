@@ -1,5 +1,6 @@
 import 'dart:io';
-import 'package:xml/xml.dart' as xml;
+
+import 'package:xml/xml.dart';
 
 String escape(String value) {
   return value.replaceAll('\'', '\'\'');
@@ -7,8 +8,8 @@ String escape(String value) {
 
 void main() {
   File('data/JMdict').readAsString().then((String contents) {
-      final String filenameExpression = 'data/generated/sql/expression.sql';
-    var document = xml.parse(contents);
+    final String filenameExpression = 'data/generated/sql/expression.sql';
+    var document = XmlDocument.parse(contents);
     var entries = document.findAllElements('entry');
     int senseId = 0;
     entries.forEach((entry) {
@@ -44,15 +45,16 @@ void main() {
         //if the sense has no pos, take the poses of the previous sense
         var posesSense = sense.findAllElements('pos').toList();
         poses = posesSense.isEmpty ? poses : posesSense;
-        if(lang == null)lang = 'eng';
+        if (lang == null) lang = 'eng';
 
         String glossesStr = '';
-        glosses.forEach((gloss) => glossesStr += gloss.text.replaceAll(';', ' ') + ';');
+        glosses.forEach(
+            (gloss) => glossesStr += gloss.text.replaceAll(';', ' ') + ';');
 
         String posesStr = '';
         poses.asMap().forEach((i, pos) {
           String posStr = pos.text.trim();
-          posStr = posStr.substring(1, posStr.length - 1);   //remove & and ;
+          posStr = posStr.substring(1, posStr.length - 1); //remove & and ;
           posesStr += posStr;
 
           if (i < poses.length - 1) posesStr += ',';
@@ -60,9 +62,8 @@ void main() {
 
         String sqlSense =
             "INSERT INTO sense (id, id_expression, glosses, pos, lang) VALUES ($senseId, $entSeq, '${escape(glossesStr)}', '${escape(posesStr)}', '$lang');\n";
-        File(filenameExpression).writeAsStringSync(
-            '$sqlSense',
-            mode: FileMode.append);
+        File(filenameExpression)
+            .writeAsStringSync('$sqlSense', mode: FileMode.append);
 
         senseId++;
       });
