@@ -1,3 +1,7 @@
+# Goal
+
+Generate Sqlite relational databases from the JMDICT japanese dictionary.
+
 # setup
 
 ## Dart SDK 
@@ -9,7 +13,6 @@ SQL is generated using scripts written in `dart`;
 Download required packages with
 
 	pub get
-
 
 ## Utils required binaries
 
@@ -24,12 +27,9 @@ sqlite3 db files are created and populated using the `sqlite3` binary.
 sudo apt install sqlite3
 ```
 
-# src scripts
+# scripts
 
-.sh files are executed with bash
-.dart files are executed with dart
-
-# Call location
+Bash scripts are provided in order to facilitate the creation of .db files.
 
 Scripts needs to be called from the projet's root
 
