@@ -42,7 +42,7 @@ Scripts needs to be called from the projet's root
 
 Will download dictionary files into the `data` directory. 
 
-Please note that for some reason the doctype (from <!DOCTYPE kanjidic2 [ to ]> )of kanjidic2.xml cannot be parsed to generate SQL and must be remove before calling create_sql.sh.
+The doctype `<!DOCTYPE kanjidic2 [ to ]>` of kanjidic2.xml cannot be parsed to generate SQL and must be remove before calling create_sql.sh.
 
 ## 2. Create sql
 
