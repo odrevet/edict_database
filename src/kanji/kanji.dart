@@ -2,7 +2,7 @@ class Meaning {
   String meaning;
   String lang;
 
-  Meaning({this.meaning, this.lang});
+  Meaning({required this.meaning, required this.lang});
 }
 
 class Kanji {
@@ -14,8 +14,8 @@ class Kanji {
   final List<Meaning> meanings;
 
   Kanji(
-      {this.character,
-      this.stroke,
+      {required this.character,
+      required this.stroke,
       this.radicals = const [],
       this.on = const [],
       this.kun = const [],

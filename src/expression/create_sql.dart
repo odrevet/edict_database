@@ -31,7 +31,7 @@ void main() {
       var senses = entry.findAllElements('sense');
       senses.forEach((sense) {
         var glosses = sense.findAllElements('gloss');
-        String lang;
+        String? lang;
         glosses.forEach((gloss) {
           var langAttr = gloss.attributes
               .where((attribute) => attribute.name.toString() == 'xml:lang');
