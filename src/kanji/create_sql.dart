@@ -20,16 +20,16 @@ void main() async {
     var document = XmlDocument.parse(contents);
     var characters = document.findAllElements('character');
 
-    characters.forEach((character) {
+    for (var character in characters) {
       String literal = character.findAllElements('literal').first.text;
 
       //READINGS
       var on = <String>[];
       var kun = <String>[];
       var readingsDom = character.findAllElements('reading');
-      readingsDom.forEach((reading) {
+      for (var reading in readingsDom) {
         var attributes = reading.attributes;
-        attributes.forEach((attribute) {
+        for (var attribute in attributes) {
           switch (attribute.value) {
             case 'ja_on':
               on.add(reading.text);
@@ -38,8 +38,8 @@ void main() async {
               kun.add(reading.text);
               break;
           }
-        });
-      });
+        }
+      }
 
       //RADICALS
       var radicals = <String>[];
@@ -53,15 +53,15 @@ void main() async {
       //MEANINGS
       var meanings = <Meaning>[];
       var meaningsDom = character.findAllElements('meaning');
-      meaningsDom.forEach((meaning) {
+      for (var meaning in meaningsDom) {
         var attributes = meaning.attributes;
         var attributesLang = attributes
             .where((attribute) => attribute.name.toString() == 'm_lang');
         String lang;
 
-        if (attributesLang.isEmpty)
+        if (attributesLang.isEmpty) {
           lang = "eng";
-        else {
+        } else {
           switch (attributesLang.first.value) {
             case 'fr':
               lang = 'fre';
@@ -78,7 +78,7 @@ void main() async {
         }
 
         meanings.add(Meaning(meaning: escape(meaning.text), lang: lang));
-      });
+      }
 
       //Add kanji to list
       kanjis.add(Kanji(
@@ -89,10 +89,10 @@ void main() async {
           on: on,
           kun: kun,
           meanings: meanings));
-    });
+    }
 
     //Generate the SQL from the List of Kanji
-    kanjis.forEach((Kanji kanji) {
+    for (var kanji in kanjis) {
       String sql =
           "INSERT INTO kanji VALUES ('${kanji.character}', ${kanji.stroke});\n";
 
@@ -134,6 +134,6 @@ void main() async {
       }
 
       File(filename).writeAsStringSync(sql, mode: FileMode.append);
-    });
+    }
   });
 }

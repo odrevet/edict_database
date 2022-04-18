@@ -12,16 +12,17 @@ void main() {
     var document = XmlDocument.parse(contents);
     var entries = document.findAllElements('entry');
     int senseId = 0;
-    entries.forEach((entry) {
+    for (var entry in entries) {
       int entSeq = int.parse(entry.findAllElements('ent_seq').first.text);
       String reb = entry.findAllElements('reb').first.text;
       var kebElements = entry.findAllElements('keb');
       String keb;
 
-      if (kebElements.isNotEmpty)
+      if (kebElements.isNotEmpty) {
         keb = '"${kebElements.first.text}"';
-      else
+      } else {
         keb = 'NULL';
+      }
 
       String sqlExp = 'INSERT INTO expression values ($entSeq,  $keb, "$reb");';
       File(filenameExpression)
@@ -30,26 +31,28 @@ void main() {
       // SENSES
       var poses;
       var senses = entry.findAllElements('sense');
-      senses.forEach((sense) {
+      for (var sense in senses) {
         var glosses = sense.findAllElements('gloss');
         String? lang;
-        glosses.forEach((gloss) {
+        for (var gloss in glosses) {
           var langAttr = gloss.attributes
               .where((attribute) => attribute.name.toString() == 'xml:lang');
-          if (langAttr.isEmpty)
+          if (langAttr.isEmpty) {
             lang = 'eng';
-          else
+          } else {
             lang = langAttr.first.value;
-        });
+          }
+        }
 
         //if the sense has no pos, take the poses of the previous sense
         var posesSense = sense.findAllElements('pos').toList();
         poses = posesSense.isEmpty ? poses : posesSense;
-        if (lang == null) lang = 'eng';
+        lang ??= 'eng';
 
         String glossesStr = '';
-        glosses.forEach(
-            (gloss) => glossesStr += gloss.text.replaceAll(';', ' ') + ';');
+        for (var gloss in glosses) {
+          glossesStr += gloss.text.replaceAll(';', ' ') + ';';
+        }
 
         String posesStr = '';
         poses.asMap().forEach((i, pos) {
@@ -63,10 +66,10 @@ void main() {
         String sqlSense =
             "INSERT INTO sense (id, id_expression, glosses, pos, lang) VALUES ($senseId, $entSeq, '${escape(glossesStr)}', '${escape(posesStr)}', '$lang');\n";
         File(filenameExpression)
-            .writeAsStringSync('$sqlSense', mode: FileMode.append);
+            .writeAsStringSync(sqlSense, mode: FileMode.append);
 
         senseId++;
-      });
-    });
+      }
+    }
   });
 }
