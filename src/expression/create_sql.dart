@@ -29,7 +29,7 @@ void main() {
           .writeAsStringSync('$sqlExp\n', mode: FileMode.append);
 
       // SENSES
-      var poses;
+      dynamic poses;
       var senses = entry.findAllElements('sense');
       for (var sense in senses) {
         var glosses = sense.findAllElements('gloss');

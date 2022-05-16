@@ -25,10 +25,10 @@ class Kanji {
     return Kanji(
       character: map['id'],
       stroke: map['stroke'],
-      radicals: map['radicals'] != null ? map['radicals'].split(',') : null,
-      on: map['on_reading'] != null ? map['on_reading'].split(',') : null,
-      kun: map['kun_reading'] != null ? map['kun_reading'].split(',') : null,
-      meanings: map['meanings'] != null ? map['meanings'].split(',') : null,
+      radicals: map['radicals']?.split(','),
+      on: map['on_reading']?.split(','),
+      kun: map['kun_reading']?.split(','),
+      meanings: map['meanings']?.split(','),
     );
   }
 
