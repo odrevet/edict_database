@@ -51,7 +51,7 @@ void main() {
 
         String glossesStr = '';
         for (var gloss in glosses) {
-          glossesStr += gloss.text.replaceAll(';', ' ') + ';';
+          glossesStr += '${gloss.text.replaceAll(';', ' ')};';
         }
 
         String posesStr = '';
