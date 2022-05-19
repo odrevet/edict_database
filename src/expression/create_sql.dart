@@ -42,17 +42,17 @@ void main() {
           } else {
             lang = langAttr.first.value;
           }
+
+          String sqlGloss =
+              "INSERT INTO gloss (id_sense, lang, gloss) VALUES ($senseId, '$lang', '${escape(gloss.text)}');\n";
+
+          File(filenameExpression)
+              .writeAsStringSync(sqlGloss, mode: FileMode.append);
         }
 
         //if the sense has no pos, take the poses of the previous sense
         var posesSense = sense.findAllElements('pos').toList();
         poses = posesSense.isEmpty ? poses : posesSense;
-        lang ??= 'eng';
-
-        String glossesStr = '';
-        for (var gloss in glosses) {
-          glossesStr += '${gloss.text.replaceAll(';', ' ')};';
-        }
 
         String posesStr = '';
         poses.asMap().forEach((i, pos) {
@@ -64,7 +64,7 @@ void main() {
         });
 
         String sqlSense =
-            "INSERT INTO sense (id, id_expression, glosses, pos, lang) VALUES ($senseId, $entSeq, '${escape(glossesStr)}', '${escape(posesStr)}', '$lang');\n";
+            "INSERT INTO sense (id, id_expression, pos) VALUES ($senseId, $entSeq, '${escape(posesStr)}');\n";
         File(filenameExpression)
             .writeAsStringSync(sqlSense, mode: FileMode.append);
 
