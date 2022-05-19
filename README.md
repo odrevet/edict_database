@@ -29,16 +29,14 @@ sudo apt install sqlite3
 
 # scripts
 
-Bash scripts are provided in order to facilitate the creation of .db files.
-
-Scripts needs to be called from the projet's root
+Bash scripts src/run.bash can be called with arguments
 
 # Steps to create db files
 
 ## 1. Get Dictionaries
 
-    bash src/expression/get_jmdict.sh
-    bash src/kanji/get_kanjidic2.sh
+    bash src/run.bash kanji --download
+    bash src/run.bash expression --download
 
 Will download dictionary files into the `data` directory.
 
@@ -46,51 +44,34 @@ Will download dictionary files into the `data` directory.
 
 To create the `data/generated/sql/expression.sql` file
 
-	bash src/create_sql.sh expression
+	bash src/run.bash expression sql
 
 To create the `data/generated/sql/kanji.sql` file
 
-	bash src/create_sql.sh kanji
+	bash src/run.bash kanji sql
 
 ## 3. Init db
 
-Create .db file  
+Create .db file
 
 To create the `data/generated/db/expression.db` file
 
-    bash src/init_db.sh expression
+    bash src/run.bash expression --init
 
 To create the `data/generated/db/kanji.db` file
 
-	bash src/init_db.sh kanji
+	bash src/run.bash kanji --init
 
 ## 4. Populate db from generated sql files
 
-
 To populate the `data/generated/db/expression.db` file
 
-	bash src/populate_db.sh expression
+	bash src/run.bash expression --populate
 
 To populate the `data/generated/db/kanji.db` file
 
-	bash src/populate_db.sh kanji
+	bash src/run.bash kanji --populate
 
-
-## Other scripts
-
-* delete_sql.sh
-
-Remove the expression or kanji generated sql.
-
-Needs to be called between calls to create_sql.sh as the sql in append to the sql file.
-
-* delete_db.sh
-
-Delete the expression or kanji database
-
-* reset_db.sh
-
-call delete_db.sh then init_db.sh
 
 # Documentation
 
