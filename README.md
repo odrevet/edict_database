@@ -27,51 +27,16 @@ sqlite3 db files are created and populated using the `sqlite3` binary.
 sudo apt install sqlite3
 ```
 
-# scripts
+# run.bash
 
 Bash scripts src/run.bash can be called with arguments
 
-# Steps to create db files
-
-## 1. Get Dictionaries
-
-    bash src/run.bash kanji --download
-    bash src/run.bash expression --download
-
-Will download dictionary files into the `data` directory.
-
-## 2. Create sql
-
-To create the `data/generated/sql/expression.sql` file
-
-	bash src/run.bash expression sql
-
-To create the `data/generated/sql/kanji.sql` file
-
-	bash src/run.bash kanji sql
-
-## 3. Init db
-
-Create .db file
-
-To create the `data/generated/db/expression.db` file
-
-    bash src/run.bash expression --init
-
-To create the `data/generated/db/kanji.db` file
-
-	bash src/run.bash kanji --init
-
-## 4. Populate db from generated sql files
-
-To populate the `data/generated/db/expression.db` file
-
-	bash src/run.bash expression --populate
-
-To populate the `data/generated/db/kanji.db` file
-
-	bash src/run.bash kanji --populate
-
+    bash run.bash <kanji|expression|help> [arguments]
+    --download   download JMdict (expression) or kanjidic2 (kanji)
+    --sql        generate sql from downloaded dictionary
+    --init       create db file tables
+    --populate   populate db file from generated sql
+    --clean     delete db and sql file
 
 # Documentation
 

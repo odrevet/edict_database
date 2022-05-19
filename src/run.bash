@@ -7,7 +7,7 @@ usage()
   echo "--sql        generate sql from downloaded dictionary"
   echo "--init       create db file tables"
   echo "--populate   populate db file from generated sql"
-  echo "--delete     delete db file"
+  echo "--clean     delete db and sql file"
 }
 
 db=$1
@@ -30,10 +30,6 @@ while true; do
   case "$2" in
   --sql)
     dart "src/${db}/create_sql.dart"
-    shift
-    ;;
-  --delete)
-    rm "data/generated/db/${db}.db"
     shift
     ;;
   --init)
@@ -73,6 +69,11 @@ while true; do
       wget http://nihongo.monash.edu/kanjidic2/kanjidic2.xml.gz --directory-prefix=data
       gunzip data/kanjidic2.xml.gz
     fi
+    shift
+    ;;
+  --clean)
+      rm "data/generated/db/${db}.db"
+      rm "data/generated/sql/${db}.sql"
     shift
     ;;
   *) break ;;
