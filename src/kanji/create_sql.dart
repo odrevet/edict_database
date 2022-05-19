@@ -17,6 +17,10 @@ void main() async {
   List<Kanji> kanjis = [];
 
   File('data/kanjidic2.xml').readAsString().then((String contents) {
+    // remove doctype
+    contents = contents.replaceRange(
+        contents.indexOf('<!DOCTYPE'), contents.indexOf('<kanjidic2>'), '');
+
     var document = XmlDocument.parse(contents);
     var characters = document.findAllElements('character');
 

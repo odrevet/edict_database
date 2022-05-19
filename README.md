@@ -40,9 +40,7 @@ Scripts needs to be called from the projet's root
     bash src/expression/get_jmdict.sh
     bash src/kanji/get_kanjidic2.sh
 
-Will download dictionary files into the `data` directory. 
-
-The doctype `<!DOCTYPE kanjidic2 [ ... >` of kanjidic2.xml cannot be parsed to generate SQL and must be remove before calling create_sql.sh.
+Will download dictionary files into the `data` directory.
 
 ## 2. Create sql
 
