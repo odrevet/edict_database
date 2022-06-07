@@ -31,7 +31,7 @@ sudo apt install sqlite3
 
 Bash scripts src/run.bash can be called with arguments
 
-    bash run.bash <kanji|expression|help> [arguments]
+    bash src/run.bash <kanji|expression|help> [arguments]
     --download   download JMdict (expression) or kanjidic2 (kanji)
     --sql        generate sql from downloaded dictionary
     --init       create db file tables
