@@ -97,40 +97,37 @@ void main() async {
           "INSERT INTO kanji VALUES ('${kanji.character}', ${kanji.stroke});\n";
 
       if (kanji.radicals.isNotEmpty) {
-        sql += "INSERT INTO kanji_radical VALUES \n";
-        kanji.radicals.asMap().forEach((i, String radical) {
-          sql += "('${kanji.character}', '$radical')";
-          if (i < kanji.radicals.length - 1) sql += ',\n';
-        });
-        sql += ";\n";
+        var values = <String>[];
+        for (var radical in kanji.radicals) {
+          values.add("('${kanji.character}', '$radical')");
+        }
+        sql += "INSERT INTO kanji_radical VALUES ${values.join(",")};\n";
       }
 
       if (kanji.on.isNotEmpty) {
-        sql += 'INSERT INTO on_yomi VALUES \n';
-        kanji.on.asMap().forEach((i, String on) {
-          sql += "(NULL, '${kanji.character}', '$on')";
-          if (i < kanji.on.length - 1) sql += ',\n';
-        });
-        sql += ';\n';
+        var values = <String>[];
+        for (var on in kanji.on) {
+          values.add("(NULL, '${kanji.character}', '$on')");
+        }
+        sql += 'INSERT INTO on_yomi VALUES ${values.join(",")};\n';
       }
 
       if (kanji.kun.isNotEmpty) {
-        sql += "INSERT INTO kun_yomi VALUES \n";
-        kanji.kun.asMap().forEach((i, String kun) {
-          sql += " (NULL, '${kanji.character}', '$kun')";
-          if (i < kanji.kun.length - 1) sql += ',\n';
-        });
-        sql += ";\n";
+        var values = <String>[];
+        for (var kun in kanji.kun) {
+          values.add(" (NULL, '${kanji.character}', '$kun')");
+        }
+
+        sql += "INSERT INTO kun_yomi VALUES ${values.join(",")};\n";
       }
 
       if (kanji.meanings.isNotEmpty) {
-        sql += "INSERT INTO meaning VALUES \n";
-        kanji.meanings.asMap().forEach((i, Meaning meaning) {
-          sql +=
-              "(NULL, '${kanji.character}', '${escape(meaning.meaning)}', '${meaning.lang}')";
-          if (i < kanji.meanings.length - 1) sql += ',\n';
-        });
-        sql += ";\n";
+        var values = <String>[];
+        for (var meaning in kanji.meanings) {
+          values.add(
+              "(NULL, '${kanji.character}', '${escape(meaning.meaning)}', '${meaning.lang}')");
+        }
+        sql += "INSERT INTO meaning VALUES ${values.join(",")};\n";
       }
 
       File(filename).writeAsStringSync(sql, mode: FileMode.append);
