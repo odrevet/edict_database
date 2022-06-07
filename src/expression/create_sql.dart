@@ -32,24 +32,6 @@ void main() {
       dynamic poses;
       var senses = entry.findAllElements('sense');
       for (var sense in senses) {
-        var glosses = sense.findAllElements('gloss');
-        String? lang;
-        for (var gloss in glosses) {
-          var langAttr = gloss.attributes
-              .where((attribute) => attribute.name.toString() == 'xml:lang');
-          if (langAttr.isEmpty) {
-            lang = 'eng';
-          } else {
-            lang = langAttr.first.value;
-          }
-
-          String sqlGloss =
-              "INSERT INTO gloss (id_sense, lang, gloss) VALUES ($senseId, '$lang', '${escape(gloss.text)}');\n";
-
-          File(filenameExpression)
-              .writeAsStringSync(sqlGloss, mode: FileMode.append);
-        }
-
         //if the sense has no pos, take the poses of the previous sense
         var posesSense = sense.findAllElements('pos').toList();
         poses = posesSense.isEmpty ? poses : posesSense;
@@ -67,6 +49,29 @@ void main() {
             "INSERT INTO sense (id, id_expression, pos) VALUES ($senseId, $entSeq, '${escape(posesStr)}');\n";
         File(filenameExpression)
             .writeAsStringSync(sqlSense, mode: FileMode.append);
+
+        // GLOSSES
+        var glosses = sense.findAllElements('gloss');
+        String? lang;
+        var sqlGlossValues = <String>[];
+        for (var gloss in glosses) {
+          var langAttr = gloss.attributes
+              .where((attribute) => attribute.name.toString() == 'xml:lang');
+          if (langAttr.isEmpty) {
+            lang = 'eng';
+          } else {
+            lang = langAttr.first.value;
+          }
+
+          sqlGlossValues.add("($senseId, '$lang', '${escape(gloss.text)}')");
+        }
+
+        if (sqlGlossValues.isNotEmpty) {
+          String sqlGloss = "INSERT INTO gloss (id_sense, lang, gloss) VALUES ";
+          File(filenameExpression).writeAsStringSync(
+              "$sqlGloss${sqlGlossValues.join(",")};\n",
+              mode: FileMode.append);
+        }
 
         senseId++;
       }
