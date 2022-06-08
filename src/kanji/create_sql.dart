@@ -91,17 +91,19 @@ void main() async {
           meanings: meanings));
     }
 
+    final buffer = StringBuffer();
+
     //Generate the SQL from the List of Kanji
     for (var kanji in kanjis) {
-      String sql =
-          "INSERT INTO kanji VALUES ('${kanji.character}', ${kanji.stroke});\n";
+      buffer.write(
+          "INSERT INTO kanji VALUES ('${kanji.character}', ${kanji.stroke});\n");
 
       if (kanji.radicals.isNotEmpty) {
         var values = <String>[];
         for (var radical in kanji.radicals) {
           values.add("('${kanji.character}', '$radical')");
         }
-        sql += "INSERT INTO kanji_radical VALUES ${values.join(",")};\n";
+        buffer.write("INSERT INTO kanji_radical VALUES ${values.join(",")};\n");
       }
 
       if (kanji.on.isNotEmpty) {
@@ -109,7 +111,7 @@ void main() async {
         for (var on in kanji.on) {
           values.add("(NULL, '${kanji.character}', '$on')");
         }
-        sql += 'INSERT INTO on_yomi VALUES ${values.join(",")};\n';
+        buffer.write('INSERT INTO on_yomi VALUES ${values.join(",")};\n');
       }
 
       if (kanji.kun.isNotEmpty) {
@@ -118,7 +120,7 @@ void main() async {
           values.add(" (NULL, '${kanji.character}', '$kun')");
         }
 
-        sql += "INSERT INTO kun_yomi VALUES ${values.join(",")};\n";
+        buffer.write("INSERT INTO kun_yomi VALUES ${values.join(",")};\n");
       }
 
       if (kanji.meanings.isNotEmpty) {
@@ -127,10 +129,10 @@ void main() async {
           values.add(
               "(NULL, '${kanji.character}', '${escape(meaning.meaning)}', '${meaning.lang}')");
         }
-        sql += "INSERT INTO meaning VALUES ${values.join(",")};\n";
+        buffer.write("INSERT INTO meaning VALUES ${values.join(",")};\n");
       }
 
-      File(filename).writeAsStringSync(sql, mode: FileMode.append);
+      File(filename).writeAsStringSync(buffer.toString());
     }
   });
 }

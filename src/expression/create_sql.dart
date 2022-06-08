@@ -8,7 +8,7 @@ String escape(String value) {
 
 void main() {
   File('data/JMdict').readAsString().then((String contents) {
-    final String filenameExpression = 'data/generated/sql/expression.sql';
+    final buffer = StringBuffer();
     var document = XmlDocument.parse(contents);
     var entries = document.findAllElements('entry');
     int senseId = 0;
@@ -24,9 +24,7 @@ void main() {
         keb = 'NULL';
       }
 
-      String sqlExp = 'INSERT INTO expression values ($entSeq,  $keb, "$reb");';
-      File(filenameExpression)
-          .writeAsStringSync('$sqlExp\n', mode: FileMode.append);
+      buffer.write('INSERT INTO expression values ($entSeq,  $keb, "$reb");\n');
 
       // SENSES
       dynamic poses;
@@ -45,15 +43,13 @@ void main() {
           if (i < poses.length - 1) posesStr += ',';
         });
 
-        String sqlSense =
-            "INSERT INTO sense (id, id_expression, pos) VALUES ($senseId, $entSeq, '${escape(posesStr)}');\n";
-        File(filenameExpression)
-            .writeAsStringSync(sqlSense, mode: FileMode.append);
+        buffer.write(
+            "INSERT INTO sense (id, id_expression, pos) VALUES ($senseId, $entSeq, '${escape(posesStr)}');\n");
 
         // GLOSSES
         var glosses = sense.findAllElements('gloss');
         String? lang;
-        var sqlGlossValues = <String>[];
+        var glossValues = <String>[];
         for (var gloss in glosses) {
           var langAttr = gloss.attributes
               .where((attribute) => attribute.name.toString() == 'xml:lang');
@@ -63,18 +59,20 @@ void main() {
             lang = langAttr.first.value;
           }
 
-          sqlGlossValues.add("($senseId, '$lang', '${escape(gloss.text)}')");
+          glossValues.add("($senseId, '$lang', '${escape(gloss.text)}')");
         }
 
-        if (sqlGlossValues.isNotEmpty) {
-          String sqlGloss = "INSERT INTO gloss (id_sense, lang, gloss) VALUES ";
-          File(filenameExpression).writeAsStringSync(
-              "$sqlGloss${sqlGlossValues.join(",")};\n",
-              mode: FileMode.append);
+        if (glossValues.isNotEmpty) {
+          buffer.write("INSERT INTO gloss (id_sense, lang, gloss) VALUES ");
+          buffer.writeAll(glossValues, ",");
+          buffer.write(";\n");
         }
 
         senseId++;
       }
     }
+
+    final String filenameExpression = 'data/generated/sql/expression.sql';
+    File(filenameExpression).writeAsStringSync(buffer.toString());
   });
 }
