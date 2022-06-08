@@ -103,7 +103,9 @@ void main() async {
         for (var radical in kanji.radicals) {
           values.add("('${kanji.character}', '$radical')");
         }
-        buffer.write("INSERT INTO kanji_radical VALUES ${values.join(",")};\n");
+        buffer.write("INSERT INTO kanji_radical VALUES ");
+        buffer.writeAll(values);
+        buffer.write(";\n");
       }
 
       if (kanji.on.isNotEmpty) {
@@ -111,7 +113,9 @@ void main() async {
         for (var on in kanji.on) {
           values.add("(NULL, '${kanji.character}', '$on')");
         }
-        buffer.write('INSERT INTO on_yomi VALUES ${values.join(",")};\n');
+        buffer.write("INSERT INTO on_yomi VALUES ");
+        buffer.writeAll(values);
+        buffer.write(";\n");
       }
 
       if (kanji.kun.isNotEmpty) {
@@ -120,7 +124,9 @@ void main() async {
           values.add(" (NULL, '${kanji.character}', '$kun')");
         }
 
-        buffer.write("INSERT INTO kun_yomi VALUES ${values.join(",")};\n");
+        buffer.write("INSERT INTO kun_yomi VALUES");
+        buffer.writeAll(values);
+        buffer.write(";\n");
       }
 
       if (kanji.meanings.isNotEmpty) {
@@ -129,7 +135,9 @@ void main() async {
           values.add(
               "(NULL, '${kanji.character}', '${escape(meaning.meaning)}', '${meaning.lang}')");
         }
-        buffer.write("INSERT INTO meaning VALUES ${values.join(",")};\n");
+        buffer.write("INSERT INTO meaning VALUES ");
+        buffer.writeAll(values);
+        buffer.write(";\n");
       }
 
       File(filename).writeAsStringSync(buffer.toString());
