@@ -9,7 +9,7 @@ usage() {
   echo "--clean     delete db and sql file"
 }
 
-db=$1
+subject=$1
 
 if [ "$subject" = "help" ]; then
   usage
