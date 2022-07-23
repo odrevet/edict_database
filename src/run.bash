@@ -2,11 +2,12 @@
 
 usage() {
   echo "bash run.bash <kanji|expression|help> [arguments]"
-  echo "--download   download JMdict (expression) or kanjidic2 (kanji)"
-  echo "--sql        generate sql from downloaded dictionary"
-  echo "--init       create db file tables"
-  echo "--populate   populate db file from generated sql"
-  echo "--clean     delete db and sql file"
+  echo "arguments: "
+  echo "--download         download JMdict (expression) or kanjidic2 (kanji)"
+  echo "--sql [languages]  generate sql from downloaded dictionary."
+  echo "--init             create db file tables"
+  echo "--populate         populate db file from generated sql"
+  echo "--clean [what]     delete db and/or sql file"
 }
 
 subject=$1
@@ -29,13 +30,13 @@ while true; do
   --sql)
     shift
 
-    args=""
-    if [[ $2 != "--*" ]]; then
-      args=$2
+    languages
+    if [[ $2 != --* ]]; then
+      languages=$2
       shift
     fi
 
-    dart "src/${subject}/create_sql.dart" $args
+    dart "src/${subject}/create_sql.dart" $languages
 
     ;;
   --init)
@@ -80,17 +81,17 @@ while true; do
   --clean)
     shift
     what=""
-    if [[ $2 != "--*" ]]; then
+    if [[ $2 != --* ]]; then
       what=$2
       shift
     fi
 
     if [ "$what" = "sql" ] || [ "$what" = "" ]; then
-      rm "data/generated/sql/${subject}.db"
+      rm "data/generated/sql/${subject}.sql"
     fi
 
     if [ "$what" = "db" ] || [ "$what" = "" ]; then
-      rm "data/generated/db/${subject}.sql"
+      rm "data/generated/db/${subject}.db"
     fi
     ;;
   *) break ;;
