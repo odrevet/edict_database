@@ -11,12 +11,12 @@ usage() {
 
 db=$1
 
-if [ "$db" = "help" ]; then
+if [ "$subject" = "help" ]; then
   usage
   exit
 fi
 
-if [ "$db" != "kanji" ] && [ "$db" != "expression" ]; then
+if [ "$subject" != "kanji" ] && [ "$subject" != "expression" ]; then
   echo "First parameter must be 'kanji' or 'expression'"
   usage
   exit
@@ -35,12 +35,12 @@ while true; do
       shift
     fi
 
-    dart "src/${db}/create_sql.dart" $args
+    dart "src/${subject}/create_sql.dart" $args
 
     ;;
   --init)
-    db_path="data/generated/db/${db}.db"
-    sql_init_path="data/init/${db}.sql"
+    db_path="data/generated/db/${subject}.db"
+    sql_init_path="data/init/${subject}.sql"
 
     if [ ! -f $db_path ]; then
       sqlite3 $db_path <$sql_init_path
@@ -51,8 +51,8 @@ while true; do
     shift
     ;;
   --populate)
-    db_path="data/generated/db/${db}.db"
-    sql_generated_path="data/generated/sql/${db}.sql"
+    db_path="data/generated/db/${subject}.db"
+    sql_generated_path="data/generated/sql/${subject}.sql"
 
     if [ ! -f $sql_generated_path ]; then
       echo "file ${sql_generated_path} not found."
@@ -68,7 +68,7 @@ while true; do
     shift
     ;;
   --download)
-    if [ "$db" = "expression"]; then
+    if [ "$subject" = "expression"]; then
       wget ftp://ftp.edrdg.org/pub/Nihongo//JMdict.gz --directory-prefix=data
       gunzip data/JMdict.gz
     else
@@ -86,11 +86,11 @@ while true; do
     fi
 
     if [ "$what" = "sql" ] || [ "$what" = "" ]; then
-      rm "data/generated/sql/${db}.db"
+      rm "data/generated/sql/${subject}.db"
     fi
 
     if [ "$what" = "db" ] || [ "$what" = "" ]; then
-      rm "data/generated/db/${db}.sql"
+      rm "data/generated/db/${subject}.sql"
     fi
     ;;
   *) break ;;
