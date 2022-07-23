@@ -39,7 +39,13 @@ Bash scripts src/run.bash can be called with arguments
     --clean     delete db and sql file
 
 
-# Generate expression sql for selected languages
+Example: Reset previously generated expression database, generate sql for english sense and populate the db: 
+
+```
+bash src/run.bash expression --clean --init --sql "eng" --populate
+```
+
+# Generate sql for selected languages
 
 The `src/expression/create_sql.dart` script can be called with arguments to process only some languages.
 
@@ -63,7 +69,11 @@ All languages
 dart src/expression/create_sql.dart
 ```
 
-note: `run.bash --sql` does not allow to pass language arguments. 
+note: `run.bash`  allow to pass language arguments with quotes, for example: 
+
+```
+bash src/run.bash expression --sql "eng fre"
+```
 
 # Documentation
 
