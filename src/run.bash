@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
-usage()
-{
+usage() {
   echo "bash run.bash <kanji|expression|help> [arguments]"
   echo "--download   download JMdict (expression) or kanjidic2 (kanji)"
   echo "--sql        generate sql from downloaded dictionary"
@@ -18,18 +17,17 @@ if [ "$db" = "help" ]; then
 fi
 
 if [ "$db" != "kanji" ] && [ "$db" != "expression" ]; then
-    echo "First parameter must be 'kanji' or 'expression'"
-    usage
-    exit
+  echo "First parameter must be 'kanji' or 'expression'"
+  usage
+  exit
 fi
-
 
 while true; do
   action=$2
   echo $action
   case "$2" in
   --sql)
-    shift 
+    shift
 
     args=""
     if [[ $2 != "--*" ]]; then
@@ -57,7 +55,7 @@ while true; do
     sql_generated_path="data/generated/sql/${db}.sql"
 
     if [ ! -f $sql_generated_path ]; then
-      echo "file ${sql_generated_path} not found. Please run 'bash src/create_sql.sh ${db}'"
+      echo "file ${sql_generated_path} not found."
       exit
     fi
 
@@ -65,7 +63,7 @@ while true; do
       echo "Populating ${db_path}..."
       echo "PRAGMA synchronous=OFF;PRAGMA journal_mode=OFF;PRAGMA temp_store=MEMORY;" | cat - $sql_generated_path | sqlite3 $db_path
     else
-      echo "file ${db_path} do not exists. Please run 'bash src/init_db.sh ${db}'"
+      echo "file ${db_path} not found. "
     fi
     shift
     ;;
@@ -80,9 +78,20 @@ while true; do
     shift
     ;;
   --clean)
-      rm "data/generated/db/${db}.db"
-      rm "data/generated/sql/${db}.sql"
     shift
+    what=""
+    if [[ $2 != "--*" ]]; then
+      what=$2
+      shift
+    fi
+
+    if [ "$what" = "sql" ] || [ "$what" = "" ]; then
+      rm "data/generated/sql/${db}.db"
+    fi
+
+    if [ "$what" = "db" ] || [ "$what" = "" ]; then
+      rm "data/generated/db/${db}.sql"
+    fi
     ;;
   *) break ;;
   esac
