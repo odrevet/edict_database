@@ -17,9 +17,7 @@ if [ "$db" = "help" ]; then
   exit
 fi
 
-if [ "$db" = "kanji" ] || [ "$db" = "expression" ]; then
-    echo "$db"
-else
+if [ "$db" != "kanji" ] && [ "$db" != "expression" ]; then
     echo "First parameter must be 'kanji' or 'expression'"
     usage
     exit
@@ -27,10 +25,20 @@ fi
 
 
 while true; do
+  action=$2
+  echo $action
   case "$2" in
   --sql)
-    dart "src/${db}/create_sql.dart"
-    shift
+    shift 
+
+    args=""
+    if [[ $2 != "--*" ]]; then
+      args=$2
+      shift
+    fi
+
+    dart "src/${db}/create_sql.dart" $args
+
     ;;
   --init)
     db_path="data/generated/db/${db}.db"
