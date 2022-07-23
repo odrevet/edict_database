@@ -30,7 +30,7 @@ while true; do
   --sql)
     shift
 
-    languages
+    languages=""
     if [[ $2 != --* ]]; then
       languages=$2
       shift
