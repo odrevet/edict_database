@@ -41,9 +41,9 @@ Bash scripts src/run.bash can be called with arguments
 
 # Generate expression sql for selected languages
 
-The `src/expression/create_sql.dart` script can be called with languages to process as arguments.
+The `src/expression/create_sql.dart` script can be called with arguments to process only some languages.
 
-The languages are in SO 639-3 format, for example: 
+The languages are in ISO 639-3 format, for example: 
 
 English and French
 
