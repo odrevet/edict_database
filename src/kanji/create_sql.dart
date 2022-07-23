@@ -109,7 +109,7 @@ void main(List<String> args) async {
           values.add("('${kanji.character}', '$radical')");
         }
         buffer.write("INSERT INTO kanji_radical VALUES ");
-        buffer.writeAll(values);
+        buffer.writeAll(values, ",");
         buffer.write(";\n");
       }
 
@@ -119,7 +119,7 @@ void main(List<String> args) async {
           values.add("(NULL, '${kanji.character}', '$on')");
         }
         buffer.write("INSERT INTO on_yomi VALUES ");
-        buffer.writeAll(values);
+        buffer.writeAll(values, ",");
         buffer.write(";\n");
       }
 
@@ -130,7 +130,7 @@ void main(List<String> args) async {
         }
 
         buffer.write("INSERT INTO kun_yomi VALUES");
-        buffer.writeAll(values);
+        buffer.writeAll(values, ",");
         buffer.write(";\n");
       }
 
@@ -141,7 +141,7 @@ void main(List<String> args) async {
               "(NULL, '${kanji.character}', '${escape(meaning.meaning)}', '${meaning.lang}')");
         }
         buffer.write("INSERT INTO meaning VALUES ");
-        buffer.writeAll(values);
+        buffer.writeAll(values, ",");
         buffer.write(";\n");
       }
 
