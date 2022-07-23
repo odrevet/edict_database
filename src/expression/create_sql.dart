@@ -9,7 +9,6 @@ String escape(String value) {
 void main(List<String> args) {
   // langs to process are passed as arguments. No arguments means all languages
   List<String> langs = args;
-  print(langs);
 
   File('data/JMdict').readAsString().then((String contents) {
     final buffer = StringBuffer();
