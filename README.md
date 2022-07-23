@@ -12,7 +12,7 @@ SQL is generated using scripts written in `dart`;
 
 Download required packages with
 
-	pub get
+	`pub get`
 
 ## Utils required binaries
 
@@ -37,6 +37,33 @@ Bash scripts src/run.bash can be called with arguments
     --init       create db file tables
     --populate   populate db file from generated sql
     --clean     delete db and sql file
+
+
+# Generate expression sql for selected languages
+
+The `src/expression/create_sql.dart` script can be called with languages to process as arguments.
+
+The languages are in SO 639-3 format, for example: 
+
+English and French
+
+```
+dart src/expression/create_sql.dart eng fre
+```
+
+English only
+
+```
+dart src/expression/create_sql.dart eng
+```
+
+All languages
+
+```
+dart src/expression/create_sql.dart
+```
+
+note: `run.bash --sql` does not allow to pass language arguments. 
 
 # Documentation
 

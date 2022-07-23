@@ -6,7 +6,11 @@ String escape(String value) {
   return value.replaceAll('\'', '\'\'');
 }
 
-void main() {
+void main(List<String> args) {
+
+  // langs to process are passed as arguments. No arguments means all languages
+  List<String> langs = args;
+
   File('data/JMdict').readAsString().then((String contents) {
     final buffer = StringBuffer();
     var document = XmlDocument.parse(contents);
@@ -59,7 +63,9 @@ void main() {
             lang = langAttr.first.value;
           }
 
-          glossValues.add("($senseId, '$lang', '${escape(gloss.text)}')");
+          if(langs.isEmpty || langs.contains(lang)){
+            glossValues.add("($senseId, '$lang', '${escape(gloss.text)}')");
+          }
         }
 
         if (glossValues.isNotEmpty) {
