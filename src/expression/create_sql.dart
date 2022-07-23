@@ -9,6 +9,7 @@ String escape(String value) {
 void main(List<String> args) {
   // langs to process are passed as arguments. No arguments means all languages
   List<String> langs = args;
+  print(langs);
 
   File('data/JMdict').readAsString().then((String contents) {
     final buffer = StringBuffer();
@@ -46,34 +47,41 @@ void main(List<String> args) {
           if (i < poses.length - 1) posesStr += ',';
         });
 
-        buffer.write(
-            "INSERT INTO sense (id, id_expression, pos) VALUES ($senseId, $entSeq, '${escape(posesStr)}');\n");
-
         // GLOSSES
         var glosses = sense.findAllElements('gloss');
         String? lang;
-        var glossValues = <String>[];
-        for (var gloss in glosses) {
-          var langAttr = gloss.attributes
-              .where((attribute) => attribute.name.toString() == 'xml:lang');
-          if (langAttr.isEmpty) {
-            lang = 'eng';
-          } else {
-            lang = langAttr.first.value;
-          }
 
-          if (langs.isEmpty || langs.contains(lang)) {
-            glossValues.add("($senseId, '$lang', '${escape(gloss.text)}')");
-          }
+        if (glosses.isEmpty) {
+          continue;
         }
 
-        if (glossValues.isNotEmpty) {
-          buffer.write("INSERT INTO gloss (id_sense, lang, gloss) VALUES ");
-          buffer.writeAll(glossValues, ",");
-          buffer.write(";\n");
+        // check lang attribute of the first gloss
+        // assum every gloss in this sense has the same lang
+        var langAttr = glosses.first.attributes
+            .where((attribute) => attribute.name.toString() == 'xml:lang');
+        if (langAttr.isEmpty) {
+          lang = 'eng';
+        } else {
+          lang = langAttr.first.value;
         }
 
-        senseId++;
+        if (langs.isEmpty || langs.contains(lang)) {
+          buffer.write(
+              "INSERT INTO sense (id, id_expression, pos, lang) VALUES ($senseId, $entSeq, '${escape(posesStr)}', '$lang');\n");
+
+          var glossValues = <String>[];
+          for (var gloss in glosses) {
+            glossValues.add("($senseId, '${escape(gloss.text)}')");
+          }
+
+          if (glossValues.isNotEmpty) {
+            buffer.write("INSERT INTO gloss (id_sense, gloss) VALUES ");
+            buffer.writeAll(glossValues, ",");
+            buffer.write(";\n");
+          }
+
+          senseId++;
+        }
       }
     }
 
