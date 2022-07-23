@@ -9,7 +9,10 @@ String escape(String value) {
   return value.replaceAll('\'', '\'\'');
 }
 
-void main() async {
+void main(List<String> args) async {
+  // langs to process are passed as arguments. No arguments means all languages
+  List<String> langs = args;
+
   String radkStr = await File('data/radkfile.json').readAsString();
   Map radkMap = jsonDecode(radkStr);
 
@@ -77,7 +80,9 @@ void main() async {
           }
         }
 
-        meanings.add(Meaning(meaning: escape(meaning.text), lang: lang));
+        if (langs.isEmpty || langs.contains(lang)) {
+          meanings.add(Meaning(meaning: escape(meaning.text), lang: lang));
+        }
       }
 
       //Add kanji to list

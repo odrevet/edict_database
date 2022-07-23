@@ -7,7 +7,6 @@ String escape(String value) {
 }
 
 void main(List<String> args) {
-
   // langs to process are passed as arguments. No arguments means all languages
   List<String> langs = args;
 
@@ -63,7 +62,7 @@ void main(List<String> args) {
             lang = langAttr.first.value;
           }
 
-          if(langs.isEmpty || langs.contains(lang)){
+          if (langs.isEmpty || langs.contains(lang)) {
             glossValues.add("($senseId, '$lang', '${escape(gloss.text)}')");
           }
         }
