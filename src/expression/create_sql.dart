@@ -27,44 +27,40 @@ void main(List<String> args) {
 
     XmlDoctype? doctypeElement = document.doctypeElement;
 
+    bool isPos = false;
+    List<Entity> entities = [];
     if (doctypeElement != null) {
-      int index = 0;
+      int index = 1;
       LineSplitter ls = LineSplitter();
+
       ls.convert(doctypeElement.internalSubset!).forEach((element) {
-        print(element);
-        List<Entity> entities = [];
         RegExp exp = RegExp(r'ENTITY (.*) "(.*)"');
         RegExp expType = RegExp(r'<!-- <(.*)> \((.*)\) entities -->');
 
-        if(expType.hasMatch(element)){
-          print("--------------------");
+        if (expType.hasMatch(element)) {
           Iterable<RegExpMatch> matches = expType.allMatches(element);
           for (final m in matches) {
-            print('${m[1]} and ${m[2]}');
+            isPos = m[1] == 'pos';
           }
 
-          index=0;
+          index = 1;
         }
 
-        if (exp.hasMatch(element)) {
+        if (exp.hasMatch(element) && isPos == true) {
           Iterable<RegExpMatch> matches = exp.allMatches(element);
           for (final m in matches) {
             entities.add(Entity(id: index, name: m[1]!, description: m[2]!));
           }
           index++;
         }
-
-        for(final e in entities){
-          print("${e.id} ; ${e.name} ; ${e.description}");
-        }
       });
 
-
+      buffer.write("INSERT INTO pos (id, name, description) VALUES \n");
+      buffer.writeAll(
+          entities.map((e) => '(${e.id}, "${e.name}", "${e.description}")'),
+          ",\n");
+      buffer.write(";\n");
     }
-
-
-
-    return;
 
     var entries = document.findAllElements('entry');
     int senseId = 0;
@@ -87,19 +83,6 @@ void main(List<String> args) {
       var senses = entry.findAllElements('sense');
 
       for (var sense in senses) {
-        //if the sense has no pos, take the poses of the previous sense
-        var posesSense = sense.findAllElements('pos').toList();
-        poses = posesSense.isEmpty ? poses : posesSense;
-
-        String posesStr = '';
-        poses.asMap().forEach((i, pos) {
-          String posStr = pos.text.trim();
-          posStr = posStr.substring(1, posStr.length - 1); //remove & and ;
-          posesStr += posStr;
-
-          if (i < poses.length - 1) posesStr += ',';
-        });
-
         // GLOSSES
         var glosses = sense.findAllElements('gloss');
         String? lang;
@@ -109,7 +92,7 @@ void main(List<String> args) {
         }
 
         // check lang attribute of the first gloss
-        // assum every gloss in this sense has the same lang
+        // assume every gloss in this sense has the same lang
         var langAttr = glosses.first.attributes
             .where((attribute) => attribute.name.toString() == 'xml:lang');
         if (langAttr.isEmpty) {
@@ -120,7 +103,23 @@ void main(List<String> args) {
 
         if (langs.isEmpty || langs.contains(lang)) {
           buffer.write(
-              "INSERT INTO sense (id, id_expression, pos, lang) VALUES ($senseId, $entSeq, '${escape(posesStr)}', '$lang');\n");
+              "INSERT INTO sense (id, id_expression, lang) VALUES ($senseId, $entSeq, '$lang');\n");
+
+          // pos or previous sense pos when empty
+          var posesSense = sense.findAllElements('pos').toList();
+          poses = posesSense.isEmpty ? poses : posesSense;
+
+          List<String> SensePos = [];
+          poses.asMap().forEach((i, pos) {
+            String posStr = pos.text.trim();
+            posStr = posStr.substring(1, posStr.length - 1); //remove & and ;
+            SensePos.add(
+                "($senseId, ${entities.firstWhere((element) => element.name == posStr).id})");
+          });
+
+          buffer.write("INSERT INTO sense_pos VALUES");
+          buffer.writeAll(SensePos, ",");
+          buffer.write(";\n");
 
           var glossValues = <String>[];
           for (var gloss in glosses) {
