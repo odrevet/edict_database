@@ -5,15 +5,8 @@ CREATE TABLE kanji(
     stroke INTEGER
 );
 
-
--- Insert Kanji not listed in kanjidic2
-INSERT INTO kanji VALUES('｜', 1);
-INSERT INTO kanji VALUES('ノ', 1);
-INSERT INTO kanji VALUES('ハ', 2);
-INSERT INTO kanji VALUES('マ', 2);
-INSERT INTO kanji VALUES('ユ', 2);
-INSERT INTO kanji VALUES('ヨ', 3);
-
+-- Insert characters not listed in kanjidic2
+INSERT INTO kanji VALUES('｜', 1),('ノ', 1),('ハ', 2),('マ', 2),('ユ', 2),('ヨ', 3);
 
 CREATE VIEW radical AS
 SELECT id, stroke FROM kanji WHERE id IN (
