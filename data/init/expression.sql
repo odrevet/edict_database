@@ -10,8 +10,9 @@ CREATE INDEX idx_reading ON expression(reading);
 CREATE TABLE sense(
     id INTEGER PRIMARY KEY,
     id_expression INTEGER,
-    lang STRING,
-    FOREIGN KEY(id_expression) REFERENCES expression(id)
+    id_lang INTEGER,
+    FOREIGN KEY(id_expression) REFERENCES expression(id),
+    FOREIGN KEY(id_lang) REFERENCES lang(id)
 );
 
 CREATE TABLE gloss(
@@ -33,4 +34,9 @@ CREATE TABLE sense_pos(
     FOREIGN KEY(id_sense) REFERENCES sense(id),
     FOREIGN KEY(id_pos) REFERENCES pos(id),
     PRIMARY KEY (id_sense, id_pos)
+);
+
+CREATE TABLE lang(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    iso3 STRING
 );

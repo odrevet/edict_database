@@ -16,11 +16,16 @@ String escape(String value) {
 }
 
 void main(List<String> args) {
-  // langs to process are passed as arguments. No arguments means all languages
+  // langs to process are passed as arguments
   List<String> langs = args;
 
   File('data/JMdict').readAsString().then((String contents) {
     final buffer = StringBuffer();
+
+    buffer.write("INSERT INTO lang VALUES \n");
+    buffer.writeAll(
+        langs.asMap().entries.map((e) => '(${e.key + 1}, "${e.value}")'), ",");
+    buffer.write(";\n");
 
     print("parsing...");
     var document = XmlDocument.parse(contents);
@@ -101,9 +106,9 @@ void main(List<String> args) {
           lang = langAttr.first.value;
         }
 
-        if (langs.isEmpty || langs.contains(lang)) {
+        if (langs.contains(lang)) {
           buffer.write(
-              "INSERT INTO sense (id, id_expression, lang) VALUES ($senseId, $entSeq, '$lang');\n");
+              "INSERT INTO sense (id, id_expression, id_lang) VALUES ($senseId, $entSeq, ${langs.indexOf(lang) + 1});\n");
 
           // pos or previous sense pos when empty
           var posesSense = sense.findAllElements('pos').toList();
