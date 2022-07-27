@@ -1,6 +1,15 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:xml/xml.dart';
+
+class Entity {
+  int id;
+  String name;
+  String description;
+
+  Entity({required this.id, required this.name, required this.description});
+}
 
 String escape(String value) {
   return value.replaceAll('\'', '\'\'');
@@ -12,7 +21,51 @@ void main(List<String> args) {
 
   File('data/JMdict').readAsString().then((String contents) {
     final buffer = StringBuffer();
+
+    print("parsing...");
     var document = XmlDocument.parse(contents);
+
+    XmlDoctype? doctypeElement = document.doctypeElement;
+
+    if (doctypeElement != null) {
+      int index = 0;
+      LineSplitter ls = LineSplitter();
+      ls.convert(doctypeElement.internalSubset!).forEach((element) {
+        print(element);
+        List<Entity> entities = [];
+        RegExp exp = RegExp(r'ENTITY (.*) "(.*)"');
+        RegExp expType = RegExp(r'<!-- <(.*)> \((.*)\) entities -->');
+
+        if(expType.hasMatch(element)){
+          print("--------------------");
+          Iterable<RegExpMatch> matches = expType.allMatches(element);
+          for (final m in matches) {
+            print('${m[1]} and ${m[2]}');
+          }
+
+          index=0;
+        }
+
+        if (exp.hasMatch(element)) {
+          Iterable<RegExpMatch> matches = exp.allMatches(element);
+          for (final m in matches) {
+            entities.add(Entity(id: index, name: m[1]!, description: m[2]!));
+          }
+          index++;
+        }
+
+        for(final e in entities){
+          print("${e.id} ; ${e.name} ; ${e.description}");
+        }
+      });
+
+
+    }
+
+
+
+    return;
+
     var entries = document.findAllElements('entry');
     int senseId = 0;
     for (var entry in entries) {
@@ -32,6 +85,7 @@ void main(List<String> args) {
       // SENSES
       dynamic poses;
       var senses = entry.findAllElements('sense');
+
       for (var sense in senses) {
         //if the sense has no pos, take the poses of the previous sense
         var posesSense = sense.findAllElements('pos').toList();
