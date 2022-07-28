@@ -5,10 +5,15 @@ import 'package:xml/xml.dart';
 
 class Entity {
   int id;
+  String type;
   String name;
   String description;
 
-  Entity({required this.id, required this.name, required this.description});
+  Entity(
+      {required this.id,
+      required this.type,
+      required this.name,
+      required this.description});
 }
 
 String escape(String value) {
@@ -32,8 +37,9 @@ void main(List<String> args) {
 
     XmlDoctype? doctypeElement = document.doctypeElement;
 
-    bool isPos = false;
-    List<Entity> entities = [];
+    // parse entities
+    Map<String, List<Entity>> entities = {};
+    String key = "";
     if (doctypeElement != null) {
       int index = 1;
       LineSplitter ls = LineSplitter();
@@ -45,24 +51,34 @@ void main(List<String> args) {
         if (expType.hasMatch(element)) {
           Iterable<RegExpMatch> matches = expType.allMatches(element);
           for (final m in matches) {
-            isPos = m[1] == 'pos';
+            key = m[1]!;
+            entities[key] = [];
           }
 
           index = 1;
         }
 
-        if (exp.hasMatch(element) && isPos == true) {
+        if (exp.hasMatch(element)) {
           Iterable<RegExpMatch> matches = exp.allMatches(element);
           for (final m in matches) {
-            entities.add(Entity(id: index, name: m[1]!, description: m[2]!));
+            entities[key]!.add(
+                Entity(id: index, type: key, name: m[1]!, description: m[2]!));
           }
           index++;
         }
       });
 
+      List<Entity> posEntities = entities['pos']!;
       buffer.write("INSERT INTO pos (id, name, description) VALUES \n");
       buffer.writeAll(
-          entities.map((e) => '(${e.id}, "${e.name}", "${e.description}")'),
+          posEntities.map((e) => '(${e.id}, "${e.name}", "${e.description}")'),
+          ",\n");
+      buffer.write(";\n");
+
+      List<Entity> miscEntites = entities['misc']!;
+      buffer.write("INSERT INTO misc (id, name, description) VALUES \n");
+      buffer.writeAll(
+          miscEntites.map((e) => '(${e.id}, "${e.name}", "${e.description}")'),
           ",\n");
       buffer.write(";\n");
     }
@@ -114,16 +130,16 @@ void main(List<String> args) {
           var posesSense = sense.findAllElements('pos').toList();
           poses = posesSense.isEmpty ? poses : posesSense;
 
-          List<String> SensePos = [];
+          List<String> sensePos = [];
           poses.asMap().forEach((i, pos) {
             String posStr = pos.text.trim();
             posStr = posStr.substring(1, posStr.length - 1); //remove & and ;
-            SensePos.add(
-                "($senseId, ${entities.firstWhere((element) => element.name == posStr).id})");
+            sensePos.add(
+                "($senseId, ${entities['pos']!.firstWhere((element) => element.name == posStr).id})");
           });
 
           buffer.write("INSERT INTO sense_pos VALUES");
-          buffer.writeAll(SensePos, ",");
+          buffer.writeAll(sensePos, ",");
           buffer.write(";\n");
 
           var glossValues = <String>[];

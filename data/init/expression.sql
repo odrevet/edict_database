@@ -1,3 +1,8 @@
+CREATE TABLE lang(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    iso3 STRING
+);
+
 CREATE TABLE expression(
     id INTEGER PRIMARY KEY,
     kanji STRING,
@@ -36,7 +41,16 @@ CREATE TABLE sense_pos(
     PRIMARY KEY (id_sense, id_pos)
 );
 
-CREATE TABLE lang(
+CREATE TABLE misc(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    iso3 STRING
+    name STRING,
+    description STRING
+);
+
+CREATE TABLE sense_misc(
+    id_sense INTEGER,
+    id_misc INTEGER,
+    FOREIGN KEY(id_sense) REFERENCES sense(id),
+    FOREIGN KEY(id_misc) REFERENCES misc(id),
+    PRIMARY KEY (id_sense, id_misc)
 );
