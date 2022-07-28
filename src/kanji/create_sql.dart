@@ -58,8 +58,7 @@ void main(List<String> args) async {
       var meaningsDom = character.findAllElements('meaning');
       for (var meaning in meaningsDom) {
         var attributes = meaning.attributes;
-        var attributesLang = attributes
-            .where((attribute) => attribute.name.toString() == 'm_lang');
+        var attributesLang = attributes.where((attribute) => attribute.name.toString() == 'm_lang');
         String lang;
 
         if (attributesLang.isEmpty) {
@@ -85,15 +84,28 @@ void main(List<String> args) async {
         }
       }
 
+      String freq = "NULL";
+      var freqElement = character.findAllElements('freq');
+      if (freqElement.isNotEmpty) {
+        freq = freqElement.first.text;
+      }
+
+      String jlpt = "NULL";
+      var jlptElement = character.findAllElements('jlpt');
+      if (jlptElement.isNotEmpty) {
+        jlpt = jlptElement.first.text;
+      }
+
       //Add kanji to list
       kanjis.add(Kanji(
           character: literal,
-          stroke:
-              int.parse(character.findAllElements('stroke_count').first.text),
+          stroke: int.parse(character.findAllElements('stroke_count').first.text),
           radicals: radicals,
           on: on,
           kun: kun,
-          meanings: meanings));
+          meanings: meanings,
+          freq: freq,
+          jlpt: jlpt));
     }
 
     final buffer = StringBuffer();
@@ -101,7 +113,7 @@ void main(List<String> args) async {
     //Generate the SQL from the List of Kanji
     for (var kanji in kanjis) {
       buffer.write(
-          "INSERT INTO kanji VALUES ('${kanji.character}', ${kanji.stroke});\n");
+          "INSERT INTO kanji VALUES ('${kanji.character}', ${kanji.stroke}, ${kanji.freq}, ${kanji.jlpt});\n");
 
       if (kanji.radicals.isNotEmpty) {
         var values = <String>[];
@@ -137,8 +149,8 @@ void main(List<String> args) async {
       if (kanji.meanings.isNotEmpty) {
         var values = <String>[];
         for (var meaning in kanji.meanings) {
-          values.add(
-              "(NULL, '${kanji.character}', '${escape(meaning.meaning)}', '${meaning.lang}')");
+          values
+              .add("(NULL, '${kanji.character}', '${escape(meaning.meaning)}', '${meaning.lang}')");
         }
         buffer.write("INSERT INTO meaning VALUES ");
         buffer.writeAll(values, ",");

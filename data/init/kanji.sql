@@ -2,11 +2,13 @@ PRAGMA foreign_keys = ON;
 
 CREATE TABLE kanji(
     id STRING PRIMARY KEY,
-    stroke INTEGER
+    stroke INTEGER,
+    freq INTEGER,
+    jlpt INTEGER
 );
 
 -- Insert characters not listed in kanjidic2
-INSERT INTO kanji VALUES('｜', 1),('ノ', 1),('ハ', 2),('マ', 2),('ユ', 2),('ヨ', 3);
+INSERT INTO kanji (id, stroke) VALUES('｜', 1),('ノ', 1),('ハ', 2),('マ', 2),('ユ', 2),('ヨ', 3);
 
 CREATE VIEW radical AS
 SELECT id, stroke FROM kanji WHERE id IN (

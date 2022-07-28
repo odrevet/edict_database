@@ -12,6 +12,8 @@ class Kanji {
   final List<String> on;
   final List<String> kun;
   final List<Meaning> meanings;
+  final String freq;
+  final String jlpt;
 
   Kanji(
       {required this.character,
@@ -19,7 +21,9 @@ class Kanji {
       this.radicals = const [],
       this.on = const [],
       this.kun = const [],
-      this.meanings = const []});
+      this.meanings = const [],
+      required this.freq,
+      required this.jlpt});
 
   factory Kanji.fromMap(Map<String, dynamic> map) {
     return Kanji(
@@ -29,6 +33,8 @@ class Kanji {
       on: map['on_reading']?.split(','),
       kun: map['kun_reading']?.split(','),
       meanings: map['meanings']?.split(','),
+      freq: map['freq'],
+      jlpt: map['jlpt'],
     );
   }
 
