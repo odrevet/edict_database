@@ -25,7 +25,7 @@ void writeEntityToBuffer(StringBuffer buffer, Map<String, List<Entity>> entities
 }
 
 void writeSenseEntityRelationToBuffer(StringBuffer buffer, Map<String, List<Entity>> entities,
-    String key, int senseId, XmlElement sense, senseEntities) {
+    String key, int senseId, senseEntities) {
   List<String> relations = [];
   senseEntities.asMap().forEach((i, senseEntity) {
     String senseEntityStr = senseEntity.text.trim();
@@ -156,19 +156,19 @@ void main(List<String> args) {
           var posesSensesTmp = sense.findAllElements('pos').toList();
           poses = posesSensesTmp.isEmpty ? poses : posesSensesTmp;
           if (poses != null && poses.isNotEmpty) {
-            writeSenseEntityRelationToBuffer(buffer, entities, "pos", senseId, sense, poses);
+            writeSenseEntityRelationToBuffer(buffer, entities, "pos", senseId, poses);
           }
 
           var miscSensesTmp = sense.findAllElements('misc').toList();
           misc = miscSensesTmp.isEmpty ? misc : miscSensesTmp;
           if (misc != null && misc.isNotEmpty) {
-            writeSenseEntityRelationToBuffer(buffer, entities, "misc", senseId, sense, misc);
+            writeSenseEntityRelationToBuffer(buffer, entities, "misc", senseId, misc);
           }
 
           var dialSensesTmp = sense.findAllElements('dial').toList();
           dial = dialSensesTmp.isEmpty ? dial : dialSensesTmp;
           if (dial != null && dial.isNotEmpty) {
-            writeSenseEntityRelationToBuffer(buffer, entities, "dial", senseId, sense, dial);
+            writeSenseEntityRelationToBuffer(buffer, entities, "dial", senseId, dial);
           }
 
           var glossValues = <String>[];
