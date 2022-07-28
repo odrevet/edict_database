@@ -54,3 +54,21 @@ CREATE TABLE sense_misc(
     FOREIGN KEY(id_misc) REFERENCES misc(id),
     PRIMARY KEY (id_sense, id_misc)
 );
+
+CREATE TABLE dial(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name STRING,
+    description STRING
+);
+
+CREATE TABLE ke_inf(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name STRING,
+    description STRING
+);
+
+CREATE TABLE re_inf(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name STRING,
+    description STRING
+);

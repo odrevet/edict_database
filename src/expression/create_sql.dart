@@ -20,6 +20,17 @@ String escape(String value) {
   return value.replaceAll('\'', '\'\'');
 }
 
+void writeEntityToBuffer(
+    StringBuffer buffer, Map<String, List<Entity>> entities, String key) {
+  if (entities[key] != null) {
+    buffer.write("INSERT INTO $key (id, name, description) VALUES \n");
+    buffer.writeAll(
+        entities[key]!.map((e) => '(${e.id}, "${e.name}", "${e.description}")'),
+        ",\n");
+    buffer.write(";\n");
+  }
+}
+
 void main(List<String> args) {
   // langs to process are passed as arguments
   List<String> langs = args;
@@ -53,6 +64,8 @@ void main(List<String> args) {
           for (final m in matches) {
             key = m[1]!;
             entities[key] = [];
+
+            print("entity: $key");
           }
 
           index = 1;
@@ -68,19 +81,11 @@ void main(List<String> args) {
         }
       });
 
-      List<Entity> posEntities = entities['pos']!;
-      buffer.write("INSERT INTO pos (id, name, description) VALUES \n");
-      buffer.writeAll(
-          posEntities.map((e) => '(${e.id}, "${e.name}", "${e.description}")'),
-          ",\n");
-      buffer.write(";\n");
-
-      List<Entity> miscEntites = entities['misc']!;
-      buffer.write("INSERT INTO misc (id, name, description) VALUES \n");
-      buffer.writeAll(
-          miscEntites.map((e) => '(${e.id}, "${e.name}", "${e.description}")'),
-          ",\n");
-      buffer.write(";\n");
+      writeEntityToBuffer(buffer, entities, "dial");
+      writeEntityToBuffer(buffer, entities, "ke_inf");
+      writeEntityToBuffer(buffer, entities, "misc");
+      writeEntityToBuffer(buffer, entities, "pos");
+      writeEntityToBuffer(buffer, entities, "re_inf");
     }
 
     var entries = document.findAllElements('entry');
