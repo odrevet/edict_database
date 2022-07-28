@@ -102,13 +102,26 @@ void main(List<String> args) {
       var kebElements = entry.findAllElements('keb');
       String keb;
 
+      // priority
+      Map<String, String> priority = {};
+      entry.findAllElements('re_pri').forEach((element) {
+        RegExp exp = RegExp(r'(\w+?)(\d+)');
+        Iterable<RegExpMatch> matches = exp.allMatches(element.innerText);
+        if (exp.hasMatch(element.innerText)) {
+          for (final m in matches) {
+            priority[m[1]!] = m[2]!;
+          }
+        }
+      });
+
       if (kebElements.isNotEmpty) {
         keb = '"${kebElements.first.text}"';
       } else {
         keb = 'NULL';
       }
 
-      buffer.write('INSERT INTO expression values ($entSeq,  $keb, "$reb");\n');
+      buffer.write(
+          'INSERT INTO expression values ($entSeq,  $keb, "$reb", ${priority['news'] ?? "NULL"}, ${priority['ichi'] ?? "NULL"}, ${priority['gai'] ?? "NULL"}, ${priority['nf'] ?? "NULL"});\n');
 
       // SENSES
       dynamic poses;
@@ -142,19 +155,19 @@ void main(List<String> args) {
 
           var posesSensesTmp = sense.findAllElements('pos').toList();
           poses = posesSensesTmp.isEmpty ? poses : posesSensesTmp;
-          if(poses != null && poses.isNotEmpty) {
+          if (poses != null && poses.isNotEmpty) {
             writeSenseEntityRelationToBuffer(buffer, entities, "pos", senseId, sense, poses);
           }
 
           var miscSensesTmp = sense.findAllElements('misc').toList();
           misc = miscSensesTmp.isEmpty ? misc : miscSensesTmp;
-          if(misc != null && misc.isNotEmpty) {
+          if (misc != null && misc.isNotEmpty) {
             writeSenseEntityRelationToBuffer(buffer, entities, "misc", senseId, sense, misc);
           }
-          
+
           var dialSensesTmp = sense.findAllElements('dial').toList();
           dial = dialSensesTmp.isEmpty ? dial : dialSensesTmp;
-          if(dial != null && dial.isNotEmpty) {
+          if (dial != null && dial.isNotEmpty) {
             writeSenseEntityRelationToBuffer(buffer, entities, "dial", senseId, sense, dial);
           }
 

@@ -6,7 +6,11 @@ CREATE TABLE lang(
 CREATE TABLE expression(
     id INTEGER PRIMARY KEY,
     kanji STRING,
-    reading STRING
+    reading STRING,
+    priority_news INTEGER,
+    priority_ichi INTEGER,
+    priority_gai INTEGER,
+    priority_nf INTEGER
 );
 
 CREATE INDEX idx_kanji ON expression(kanji);
