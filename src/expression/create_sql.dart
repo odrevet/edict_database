@@ -9,26 +9,34 @@ class Entity {
   String name;
   String description;
 
-  Entity(
-      {required this.id,
-      required this.type,
-      required this.name,
-      required this.description});
+  Entity({required this.id, required this.type, required this.name, required this.description});
 }
 
 String escape(String value) {
   return value.replaceAll('\'', '\'\'');
 }
 
-void writeEntityToBuffer(
-    StringBuffer buffer, Map<String, List<Entity>> entities, String key) {
+void writeEntityToBuffer(StringBuffer buffer, Map<String, List<Entity>> entities, String key) {
   if (entities[key] != null) {
     buffer.write("INSERT INTO $key (id, name, description) VALUES \n");
-    buffer.writeAll(
-        entities[key]!.map((e) => '(${e.id}, "${e.name}", "${e.description}")'),
-        ",\n");
+    buffer.writeAll(entities[key]!.map((e) => '(${e.id}, "${e.name}", "${e.description}")'), ",\n");
     buffer.write(";\n");
   }
+}
+
+void writeSenseEntityRelationToBuffer(StringBuffer buffer, Map<String, List<Entity>> entities,
+    String key, int senseId, XmlElement sense, senseEntities) {
+  List<String> relations = [];
+  senseEntities.asMap().forEach((i, senseEntity) {
+    String senseEntityStr = senseEntity.text.trim();
+    senseEntityStr = senseEntityStr.substring(1, senseEntityStr.length - 1); //remove & and ;
+    relations.add(
+        "($senseId, ${entities[key]!.firstWhere((element) => element.name == senseEntityStr).id})");
+  });
+
+  buffer.write("INSERT INTO sense_$key VALUES");
+  buffer.writeAll(relations, ",");
+  buffer.write(";\n");
 }
 
 void main(List<String> args) {
@@ -39,8 +47,7 @@ void main(List<String> args) {
     final buffer = StringBuffer();
 
     buffer.write("INSERT INTO lang VALUES \n");
-    buffer.writeAll(
-        langs.asMap().entries.map((e) => '(${e.key + 1}, "${e.value}")'), ",");
+    buffer.writeAll(langs.asMap().entries.map((e) => '(${e.key + 1}, "${e.value}")'), ",");
     buffer.write(";\n");
 
     print("parsing...");
@@ -74,8 +81,7 @@ void main(List<String> args) {
         if (exp.hasMatch(element)) {
           Iterable<RegExpMatch> matches = exp.allMatches(element);
           for (final m in matches) {
-            entities[key]!.add(
-                Entity(id: index, type: key, name: m[1]!, description: m[2]!));
+            entities[key]!.add(Entity(id: index, type: key, name: m[1]!, description: m[2]!));
           }
           index++;
         }
@@ -106,6 +112,8 @@ void main(List<String> args) {
 
       // SENSES
       dynamic poses;
+      dynamic misc;
+
       var senses = entry.findAllElements('sense');
 
       for (var sense in senses) {
@@ -119,8 +127,8 @@ void main(List<String> args) {
 
         // check lang attribute of the first gloss
         // assume every gloss in this sense has the same lang
-        var langAttr = glosses.first.attributes
-            .where((attribute) => attribute.name.toString() == 'xml:lang');
+        var langAttr =
+            glosses.first.attributes.where((attribute) => attribute.name.toString() == 'xml:lang');
         if (langAttr.isEmpty) {
           lang = 'eng';
         } else {
@@ -131,21 +139,17 @@ void main(List<String> args) {
           buffer.write(
               "INSERT INTO sense (id, id_expression, id_lang) VALUES ($senseId, $entSeq, ${langs.indexOf(lang) + 1});\n");
 
-          // pos or previous sense pos when empty
-          var posesSense = sense.findAllElements('pos').toList();
-          poses = posesSense.isEmpty ? poses : posesSense;
+          var posesSensesTmp = sense.findAllElements('pos').toList();
+          poses = posesSensesTmp.isEmpty ? poses : posesSensesTmp;
+          if(poses != null && poses.isNotEmpty) {
+            writeSenseEntityRelationToBuffer(buffer, entities, "pos", senseId, sense, poses);
+          }
 
-          List<String> sensePos = [];
-          poses.asMap().forEach((i, pos) {
-            String posStr = pos.text.trim();
-            posStr = posStr.substring(1, posStr.length - 1); //remove & and ;
-            sensePos.add(
-                "($senseId, ${entities['pos']!.firstWhere((element) => element.name == posStr).id})");
-          });
-
-          buffer.write("INSERT INTO sense_pos VALUES");
-          buffer.writeAll(sensePos, ",");
-          buffer.write(";\n");
+          var miscSensesTmp = sense.findAllElements('misc').toList();
+          misc = miscSensesTmp.isEmpty ? misc : miscSensesTmp;
+          if(misc != null && misc.isNotEmpty) {
+            writeSenseEntityRelationToBuffer(buffer, entities, "misc", senseId, sense, misc);
+          }
 
           var glossValues = <String>[];
           for (var gloss in glosses) {
