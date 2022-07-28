@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:xml/xml.dart';
 
+import '../common.dart';
+
 class Entity {
   int id;
   String type;
@@ -10,10 +12,6 @@ class Entity {
   String description;
 
   Entity({required this.id, required this.type, required this.name, required this.description});
-}
-
-String escape(String value) {
-  return value.replaceAll('\'', '\'\'');
 }
 
 void writeEntityToBuffer(StringBuffer buffer, Map<String, List<Entity>> entities, String key) {
@@ -34,9 +32,7 @@ void writeSenseEntityRelationToBuffer(StringBuffer buffer, Map<String, List<Enti
         "($senseId, ${entities[key]!.firstWhere((element) => element.name == senseEntityStr).id})");
   });
 
-  buffer.write("INSERT INTO sense_$key VALUES");
-  buffer.writeAll(relations, ",");
-  buffer.write(";\n");
+  writeInsertToBuffer(buffer, "sense_$key", relations);
 }
 
 void main(List<String> args) {
@@ -177,9 +173,7 @@ void main(List<String> args) {
           }
 
           if (glossValues.isNotEmpty) {
-            buffer.write("INSERT INTO gloss (id_sense, gloss) VALUES ");
-            buffer.writeAll(glossValues, ",");
-            buffer.write(";\n");
+            writeInsertToBuffer(buffer, "gloss", glossValues, "(id_sense, gloss)");
           }
 
           senseId++;

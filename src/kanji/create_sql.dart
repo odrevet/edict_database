@@ -4,10 +4,8 @@ import 'dart:io';
 import 'package:xml/xml.dart';
 
 import 'kanji.dart';
+import '../common.dart';
 
-String escape(String value) {
-  return value.replaceAll('\'', '\'\'');
-}
 
 void main(List<String> args) async {
   // langs to process are passed as arguments. No arguments means all languages
@@ -120,9 +118,7 @@ void main(List<String> args) async {
         for (var radical in kanji.radicals) {
           values.add("('${kanji.character}', '$radical')");
         }
-        buffer.write("INSERT INTO kanji_radical VALUES ");
-        buffer.writeAll(values, ",");
-        buffer.write(";\n");
+        writeInsertToBuffer(buffer, "kanji_radical", values);
       }
 
       if (kanji.on.isNotEmpty) {
@@ -130,9 +126,7 @@ void main(List<String> args) async {
         for (var on in kanji.on) {
           values.add("(NULL, '${kanji.character}', '$on')");
         }
-        buffer.write("INSERT INTO on_yomi VALUES ");
-        buffer.writeAll(values, ",");
-        buffer.write(";\n");
+        writeInsertToBuffer(buffer, "on_yomi", values);
       }
 
       if (kanji.kun.isNotEmpty) {
@@ -140,10 +134,7 @@ void main(List<String> args) async {
         for (var kun in kanji.kun) {
           values.add(" (NULL, '${kanji.character}', '$kun')");
         }
-
-        buffer.write("INSERT INTO kun_yomi VALUES");
-        buffer.writeAll(values, ",");
-        buffer.write(";\n");
+        writeInsertToBuffer(buffer, "kun_yomi", values);
       }
 
       if (kanji.meanings.isNotEmpty) {
@@ -152,9 +143,7 @@ void main(List<String> args) async {
           values
               .add("(NULL, '${kanji.character}', '${escape(meaning.meaning)}', '${meaning.lang}')");
         }
-        buffer.write("INSERT INTO meaning VALUES ");
-        buffer.writeAll(values, ",");
-        buffer.write(";\n");
+        writeInsertToBuffer(buffer, "meaning", values);
       }
 
       File(filename).writeAsStringSync(buffer.toString());
