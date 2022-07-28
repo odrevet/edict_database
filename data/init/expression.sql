@@ -61,6 +61,14 @@ CREATE TABLE dial(
     description STRING
 );
 
+CREATE TABLE sense_dial(
+    id_sense INTEGER,
+    id_dial INTEGER,
+    FOREIGN KEY(id_sense) REFERENCES sense(id),
+    FOREIGN KEY(id_dial) REFERENCES dial(id),
+    PRIMARY KEY (id_sense, id_dial)
+);
+
 CREATE TABLE ke_inf(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name STRING,

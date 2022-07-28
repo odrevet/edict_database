@@ -113,6 +113,7 @@ void main(List<String> args) {
       // SENSES
       dynamic poses;
       dynamic misc;
+      dynamic dial;
 
       var senses = entry.findAllElements('sense');
 
@@ -149,6 +150,12 @@ void main(List<String> args) {
           misc = miscSensesTmp.isEmpty ? misc : miscSensesTmp;
           if(misc != null && misc.isNotEmpty) {
             writeSenseEntityRelationToBuffer(buffer, entities, "misc", senseId, sense, misc);
+          }
+          
+          var dialSensesTmp = sense.findAllElements('dial').toList();
+          dial = dialSensesTmp.isEmpty ? dial : dialSensesTmp;
+          if(dial != null && dial.isNotEmpty) {
+            writeSenseEntityRelationToBuffer(buffer, entities, "dial", senseId, sense, dial);
           }
 
           var glossValues = <String>[];
