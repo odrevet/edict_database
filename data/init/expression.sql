@@ -4,17 +4,38 @@ CREATE TABLE lang(
 );
 
 CREATE TABLE expression(
-    id INTEGER PRIMARY KEY,
-    kanji STRING,
-    reading STRING,
-    priority_news INTEGER,
-    priority_ichi INTEGER,
-    priority_gai INTEGER,
-    priority_nf INTEGER
+    id INTEGER PRIMARY KEY
 );
 
-CREATE INDEX idx_kanji ON expression(kanji);
-CREATE INDEX idx_reading ON expression(reading);
+CREATE TABLE reading(
+    id INTEGER PRIMARY KEY,
+    id_expression INTEGER,
+    id_priority INTEGER,
+    reading STRING,
+    FOREIGN KEY(id_expression) REFERENCES expression(id),
+    FOREIGN KEY(id_priority) REFERENCES priority(id)
+);
+
+CREATE INDEX idx_reading ON reading(reading);
+
+CREATE TABLE kanji(
+    id INTEGER PRIMARY KEY,
+    id_expression INTEGER,
+    id_priority INTEGER,
+    kanji STRING,
+    FOREIGN KEY(id_expression) REFERENCES expression(id),
+    FOREIGN KEY(id_priority) REFERENCES priority(id)
+);
+
+CREATE TABLE priority(
+    id INTEGER PRIMARY KEY,
+    news INTEGER,
+    ichi INTEGER,
+    gai INTEGER,
+    nf INTEGER
+);
+
+CREATE INDEX idx_kanji ON kanji(kanji);
 
 CREATE TABLE sense(
     id INTEGER PRIMARY KEY,
@@ -79,8 +100,24 @@ CREATE TABLE ke_inf(
     description STRING
 );
 
+CREATE TABLE kanji_ke_inf(
+    id_kanji INTEGER,
+    id_ke_inf INTEGER,
+    FOREIGN KEY(id_kanji) REFERENCES kanji(id),
+    FOREIGN KEY(id_ke_inf) REFERENCES ke_inf(id),
+    PRIMARY KEY (id_kanji, id_ke_inf)
+);
+
 CREATE TABLE re_inf(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name STRING,
     description STRING
+);
+
+CREATE TABLE reading_re_inf(
+    id_reading INTEGER,
+    id_re_inf INTEGER,
+    FOREIGN KEY(id_reading) REFERENCES reading(id),
+    FOREIGN KEY(id_re_inf) REFERENCES re_inf(id),
+    PRIMARY KEY (id_reading, id_re_inf)
 );
