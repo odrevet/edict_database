@@ -104,9 +104,10 @@ void main(List<String> args) {
     }
 
     var entries = document.findAllElements('entry');
-    int senseId = 0;
+    int senseId = 1;
     int kId = 1;
     int rId = 1;
+
     // Entries
     for (var entry in entries) {
       int entSeq = int.parse(entry.findAllElements('ent_seq').first.text);
