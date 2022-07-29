@@ -133,15 +133,14 @@ void main(List<String> args) {
       for (var kElement in kElements) {
         kValues.add("($kId, $entSeq, '${kElement.findElements("keb").first.text}')");
 
-        //ke_inf
-        List<String> kanjiInfo = [];
+        //info
+        List<String> info = [];
         kElement.findAllElements('ke_inf').forEach((element) {
-          kanjiInfo.add(element.innerText);
+          info.add(element.innerText);
         });
 
-        if (kanjiInfo.isNotEmpty) {
-          writeEntryEntityRelationToBuffer(
-              buffer, entities, "ke_inf", kId, kanjiInfo, "kanji_ke_inf");
+        if (info.isNotEmpty) {
+          writeEntryEntityRelationToBuffer(buffer, entities, "ke_inf", kId, info, "kanji_ke_inf");
         }
         kId++;
       }
@@ -151,6 +150,27 @@ void main(List<String> args) {
       }
 
       // Reading Element
+      var rElements = entry.findAllElements('r_ele');
+      List<String> rValues = [];
+
+      for (var rElement in rElements) {
+        rValues.add("($rId, $entSeq, '${rElement.findElements("reb").first.text}')");
+
+        //info
+        List<String> info = [];
+        rElement.findAllElements('re_inf').forEach((element) {
+          info.add(element.innerText);
+        });
+
+        if (info.isNotEmpty) {
+          writeEntryEntityRelationToBuffer(buffer, entities, "re_inf", rId, info, "reading_re_inf");
+        }
+        rId++;
+      }
+
+      if (rValues.isNotEmpty) {
+        writeInsertToBuffer(buffer, "reading", rValues, "(id, id_expression, reading)");
+      }
 
       // SENSES
       dynamic poses;
