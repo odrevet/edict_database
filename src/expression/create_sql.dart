@@ -116,16 +116,14 @@ void main(List<String> args) {
 
       buffer.write('INSERT INTO expression values ($entSeq);\n');
 
-      // Kanji Element
-      var kElements = entry.findAllElements('k_ele');
+      // Kanji Elements
       List<String> kValues = [];
-
-      for (var kElement in kElements) {
-        kValues.add("($kId, $entSeq, '${kElement.findElements("keb").first.text}')");
+      for (var element in entry.findAllElements('k_ele')) {
+        kValues.add("($kId, $entSeq, '${element.findElements("keb").first.text}')");
 
         //info
         List<String> info = [];
-        kElement.findAllElements('ke_inf').forEach((element) {
+        element.findAllElements('ke_inf').forEach((element) {
           info.add(element.innerText);
         });
 
@@ -135,10 +133,10 @@ void main(List<String> args) {
 
         // priority
         Map<String, String> priority = {};
-        kElement.findAllElements('ke_pri').forEach((element) {
+        element.findAllElements('ke_pri').forEach((priorityElement) {
           RegExp exp = RegExp(r'(\w+?)(\d+)');
-          Iterable<RegExpMatch> matches = exp.allMatches(element.innerText);
-          if (exp.hasMatch(element.innerText)) {
+          Iterable<RegExpMatch> matches = exp.allMatches(priorityElement.innerText);
+          if (exp.hasMatch(priorityElement.innerText)) {
             for (final m in matches) {
               priority[m[1]!] = m[2]!;
             }
@@ -158,16 +156,14 @@ void main(List<String> args) {
         writeInsertToBuffer(buffer, "kanji", kValues, "(id, id_expression, kanji)");
       }
 
-      // Reading Element
-      var rElements = entry.findAllElements('r_ele');
+      // Reading Elements
       List<String> rValues = [];
-
-      for (var rElement in rElements) {
-        rValues.add("($rId, $entSeq, '${rElement.findElements("reb").first.text}')");
+      for (var element in entry.findAllElements('r_ele')) {
+        rValues.add("($rId, $entSeq, '${element.findElements("reb").first.text}')");
 
         //info
         List<String> info = [];
-        rElement.findAllElements('re_inf').forEach((element) {
+        element.findAllElements('re_inf').forEach((element) {
           info.add(element.innerText);
         });
 
@@ -178,10 +174,10 @@ void main(List<String> args) {
 
         // priority
         Map<String, String> priority = {};
-        rElement.findAllElements('re_pri').forEach((element) {
+        element.findAllElements('re_pri').forEach((priorityElement) {
           RegExp exp = RegExp(r'(\w+?)(\d+)');
-          Iterable<RegExpMatch> matches = exp.allMatches(element.innerText);
-          if (exp.hasMatch(element.innerText)) {
+          Iterable<RegExpMatch> matches = exp.allMatches(priorityElement.innerText);
+          if (exp.hasMatch(priorityElement.innerText)) {
             for (final m in matches) {
               priority[m[1]!] = m[2]!;
             }
