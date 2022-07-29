@@ -22,6 +22,22 @@ void writeEntityToBuffer(StringBuffer buffer, Map<String, List<Entity>> entities
   }
 }
 
+void writeEntryEntityRelationToBuffer(StringBuffer buffer, Map<String, List<Entity>> entities,
+    String key, int entryId, entryEntities, String tableName) {
+
+  print("$entryId $entryEntities");
+  List<String> relations = [];
+  entryEntities.asMap().forEach((i, entryEntity) {
+    String entryEntityStr = entryEntity.trim();
+    entryEntityStr = entryEntityStr.substring(1, entryEntityStr.length - 1); //remove & and ;
+    relations.add(
+        "($entryId, ${entities[key]!.firstWhere((element) => element.name == entryEntityStr).id})");
+  });
+
+  print(relations);
+  writeInsertToBuffer(buffer, tableName, relations);
+}
+
 void writeSenseEntityRelationToBuffer(StringBuffer buffer, Map<String, List<Entity>> entities,
     String key, int senseId, senseEntities) {
   List<String> relations = [];
@@ -92,14 +108,16 @@ void main(List<String> args) {
 
     var entries = document.findAllElements('entry');
     int senseId = 0;
+    // Entries
     for (var entry in entries) {
       int entSeq = int.parse(entry.findAllElements('ent_seq').first.text);
       String reb = entry.findAllElements('reb').first.text;
-      var kebElements = entry.findAllElements('keb');
-      String keb;
+
+      buffer.write(
+          'INSERT INTO expression values ($entSeq);\n');
 
       // priority
-      Map<String, String> priority = {};
+      /*Map<String, String> priority = {};
       entry.findAllElements('re_pri').forEach((element) {
         RegExp exp = RegExp(r'(\w+?)(\d+)');
         Iterable<RegExpMatch> matches = exp.allMatches(element.innerText);
@@ -108,16 +126,41 @@ void main(List<String> args) {
             priority[m[1]!] = m[2]!;
           }
         }
-      });
+      });*/
 
-      if (kebElements.isNotEmpty) {
-        keb = '"${kebElements.first.text}"';
-      } else {
-        keb = 'NULL';
+      // Kanji Element
+      var kElements = entry.findAllElements('k_ele');
+      List<String> kValues = [];
+      for(var kElement in kElements){
+        kValues.add("($entSeq, '${kElement.findElements("keb").first.text}')");
+      }
+      if(kValues.isNotEmpty) {
+        writeInsertToBuffer(buffer, "kanji", kValues, "(id_expression, kanji)");
       }
 
-      buffer.write(
-          'INSERT INTO expression values ($entSeq,  $keb, "$reb", ${priority['news'] ?? "NULL"}, ${priority['ichi'] ?? "NULL"}, ${priority['gai'] ?? "NULL"}, ${priority['nf'] ?? "NULL"});\n');
+      // Reading Element
+      var rElements = entry.findAllElements('r_ele');
+      List<String> rValues = [];
+      for(var rElement in rElements){
+        rValues.add("($entSeq, '${rElement.findElements("reb").first.text}')");
+      }
+      if(rValues.isNotEmpty) {
+        writeInsertToBuffer(buffer, "reading", rValues, "(id_expression, reading)");
+      }
+
+      //ke_inf
+      /*List<String> kanjiInfo = [];
+      entry.findAllElements('ke_inf').forEach((element) {
+        kanjiInfo.add(element.innerText);
+      });
+      writeEntryEntityRelationToBuffer(buffer, entities, "ke_inf", entSeq, kanjiInfo, "entry_kanji_info");*/
+
+      //re_inf
+      /*List<String> readingInfo = [];
+      entry.findAllElements('re_inf').forEach((element) {
+        readingInfo.add(element.innerText);
+      });
+      writeEntryEntityRelationToBuffer(buffer, entities, "re_inf", entSeq, readingInfo, "entry_reading_info");*/
 
       // SENSES
       dynamic poses;
