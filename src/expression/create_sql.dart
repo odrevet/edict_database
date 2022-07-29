@@ -107,6 +107,7 @@ void main(List<String> args) {
     int senseId = 1;
     int kId = 1;
     int rId = 1;
+    int prioId = 1;
 
     // Entries
     for (var entry in entries) {
@@ -114,18 +115,6 @@ void main(List<String> args) {
       String reb = entry.findAllElements('reb').first.text;
 
       buffer.write('INSERT INTO expression values ($entSeq);\n');
-
-      // priority
-      /*Map<String, String> priority = {};
-      entry.findAllElements('re_pri').forEach((element) {
-        RegExp exp = RegExp(r'(\w+?)(\d+)');
-        Iterable<RegExpMatch> matches = exp.allMatches(element.innerText);
-        if (exp.hasMatch(element.innerText)) {
-          for (final m in matches) {
-            priority[m[1]!] = m[2]!;
-          }
-        }
-      });*/
 
       // Kanji Element
       var kElements = entry.findAllElements('k_ele');
@@ -143,6 +132,25 @@ void main(List<String> args) {
         if (info.isNotEmpty) {
           writeEntryEntityRelationToBuffer(buffer, entities, "ke_inf", kId, info, "kanji_ke_inf");
         }
+
+        // priority
+        Map<String, String> priority = {};
+        kElement.findAllElements('ke_pri').forEach((element) {
+          RegExp exp = RegExp(r'(\w+?)(\d+)');
+          Iterable<RegExpMatch> matches = exp.allMatches(element.innerText);
+          if (exp.hasMatch(element.innerText)) {
+            for (final m in matches) {
+              priority[m[1]!] = m[2]!;
+            }
+          }
+        });
+
+        if (priority.isNotEmpty) {
+          buffer.write(
+              "INSERT INTO priority VALUES ($prioId, ${priority['news'] ?? 'NULL'}, ${priority['ichi'] ?? 'NULL'}, ${priority['gai'] ?? 'NULL'}, ${priority['nf'] ?? 'NULL'});\n");
+          prioId++;
+        }
+
         kId++;
       }
 
@@ -167,6 +175,24 @@ void main(List<String> args) {
           writeEntryEntityRelationToBuffer(buffer, entities, "re_inf", rId, info, "reading_re_inf");
         }
         rId++;
+
+        // priority
+        Map<String, String> priority = {};
+        rElement.findAllElements('re_pri').forEach((element) {
+          RegExp exp = RegExp(r'(\w+?)(\d+)');
+          Iterable<RegExpMatch> matches = exp.allMatches(element.innerText);
+          if (exp.hasMatch(element.innerText)) {
+            for (final m in matches) {
+              priority[m[1]!] = m[2]!;
+            }
+          }
+        });
+
+        if (priority.isNotEmpty) {
+          buffer.write(
+              "INSERT INTO priority VALUES ($prioId, ${priority['news'] ?? 'NULL'}, ${priority['ichi'] ?? 'NULL'}, ${priority['gai'] ?? 'NULL'}, ${priority['nf'] ?? 'NULL'});\n");
+          prioId++;
+        }
       }
 
       if (rValues.isNotEmpty) {
