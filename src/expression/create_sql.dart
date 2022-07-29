@@ -48,6 +48,23 @@ void writeSenseEntityRelationToBuffer(StringBuffer buffer, Map<String, List<Enti
   writeInsertToBuffer(buffer, "sense_$key", relations);
 }
 
+
+
+Map<String, String> parsePriorityElement(XmlElement parent, String tagName){
+  Map<String, String> priority = {};
+  parent.findAllElements(tagName).forEach((priorityElement) {
+    RegExp exp = RegExp(r'(\w+?)(\d+)');
+    Iterable<RegExpMatch> matches = exp.allMatches(priorityElement.innerText);
+    if (exp.hasMatch(priorityElement.innerText)) {
+      for (final m in matches) {
+        priority[m[1]!] = m[2]!;
+      }
+    }
+  });
+
+  return priority;
+}
+
 void main(List<String> args) {
   // langs to process are passed as arguments
   List<String> langs = args;
@@ -132,17 +149,7 @@ void main(List<String> args) {
         }
 
         // priority
-        Map<String, String> priority = {};
-        element.findAllElements('ke_pri').forEach((priorityElement) {
-          RegExp exp = RegExp(r'(\w+?)(\d+)');
-          Iterable<RegExpMatch> matches = exp.allMatches(priorityElement.innerText);
-          if (exp.hasMatch(priorityElement.innerText)) {
-            for (final m in matches) {
-              priority[m[1]!] = m[2]!;
-            }
-          }
-        });
-
+        Map<String, String> priority = parsePriorityElement(element, 'ke_pri');
         if (priority.isNotEmpty) {
           buffer.write(
               "INSERT INTO priority VALUES ($prioId, ${priority['news'] ?? 'NULL'}, ${priority['ichi'] ?? 'NULL'}, ${priority['gai'] ?? 'NULL'}, ${priority['nf'] ?? 'NULL'});\n");
@@ -173,17 +180,7 @@ void main(List<String> args) {
         rId++;
 
         // priority
-        Map<String, String> priority = {};
-        element.findAllElements('re_pri').forEach((priorityElement) {
-          RegExp exp = RegExp(r'(\w+?)(\d+)');
-          Iterable<RegExpMatch> matches = exp.allMatches(priorityElement.innerText);
-          if (exp.hasMatch(priorityElement.innerText)) {
-            for (final m in matches) {
-              priority[m[1]!] = m[2]!;
-            }
-          }
-        });
-
+        Map<String, String> priority = parsePriorityElement(element, 're_pri');
         if (priority.isNotEmpty) {
           buffer.write(
               "INSERT INTO priority VALUES ($prioId, ${priority['news'] ?? 'NULL'}, ${priority['ichi'] ?? 'NULL'}, ${priority['gai'] ?? 'NULL'}, ${priority['nf'] ?? 'NULL'});\n");
