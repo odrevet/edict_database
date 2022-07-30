@@ -39,7 +39,7 @@ void writeSenseEntityRelationToBuffer(StringBuffer buffer, Map<String, List<Enti
     String key, int senseId, senseEntities) {
   List<String> relations = [];
   senseEntities.forEach((senseEntity) {
-    String senseEntityStr = senseEntity.text.trim();
+    String senseEntityStr = senseEntity.trim();
     senseEntityStr = senseEntityStr.substring(1, senseEntityStr.length - 1); //remove & and ;
     relations.add(
         "($senseId, ${entities[key]!.firstWhere((element) => element.name == senseEntityStr).id})");
@@ -223,19 +223,19 @@ void main(List<String> args) {
               "INSERT INTO sense (id, id_expression, id_lang) VALUES ($senseId, $entSeq, ${langs.indexOf(lang) + 1});\n");
 
           var posesSensesTmp = sense.findAllElements('pos').toList();
-          poses = posesSensesTmp.isEmpty ? poses : posesSensesTmp;
+          poses = posesSensesTmp.isEmpty ? poses : posesSensesTmp.map((e) => e.text);
           if (poses != null && poses.isNotEmpty) {
             writeSenseEntityRelationToBuffer(buffer, entities, "pos", senseId, poses);
           }
 
           var miscSensesTmp = sense.findAllElements('misc').toList();
-          misc = miscSensesTmp.isEmpty ? misc : miscSensesTmp;
+          misc = miscSensesTmp.isEmpty ? misc : miscSensesTmp.map((e) => e.text);
           if (misc != null && misc.isNotEmpty) {
             writeSenseEntityRelationToBuffer(buffer, entities, "misc", senseId, misc);
           }
 
           var dialSensesTmp = sense.findAllElements('dial').toList();
-          dial = dialSensesTmp.isEmpty ? dial : dialSensesTmp;
+          dial = dialSensesTmp.isEmpty ? dial : dialSensesTmp.map((e) => e.text);
           if (dial != null && dial.isNotEmpty) {
             writeSenseEntityRelationToBuffer(buffer, entities, "dial", senseId, dial);
           }
