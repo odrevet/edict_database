@@ -18,7 +18,7 @@ void writeEntityToBuffer(StringBuffer buffer, Map<String, List<Entity>> entities
     writeInsertToBuffer(
         buffer,
         key,
-        entities[key]!.map((e) => [e.id, "'${e.name}'", "'${e.description}'"]).toList(),
+        entities[key]!.map((e) => [e.id, "'${e.name}'", "'${escape(e.description)}'"]).toList(),
         "(id, name, description)");
 
 void writeRelationToBuffer(StringBuffer buffer, Map<String, List<Entity>> entities, String key,
@@ -147,9 +147,9 @@ void main(List<String> args) {
       });
 
       writeEntityToBuffer(buffer, entities, "dial");
-      writeEntityToBuffer(buffer, entities, "ke_inf");
       writeEntityToBuffer(buffer, entities, "misc");
       writeEntityToBuffer(buffer, entities, "pos");
+      writeEntityToBuffer(buffer, entities, "ke_inf");
       writeEntityToBuffer(buffer, entities, "re_inf");
     }
 
