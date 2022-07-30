@@ -18,7 +18,7 @@ void writeEntityToBuffer(StringBuffer buffer, Map<String, List<Entity>> entities
     writeInsertToBuffer(
         buffer,
         key,
-        entities[key]!.map((e) => [e.id, "'${e.name}'", "'${escape(e.description)}'"]).toList(),
+        entities[key]!.map((e) => [e.id, "'${e.name}'", "'${escape(e.description)}'"]),
         ["id", "name", "description"]);
 
 void writeRelationToBuffer(StringBuffer buffer, Map<String, List<Entity>> entities, String key,
@@ -40,7 +40,7 @@ Iterable<String>? writeSenseRelationToBuffer(
     XmlElement senseElement,
     int senseId,
     Iterable<String>? senseEntities) {
-  var posesSensesTmp = senseElement.findAllElements(key).toList();
+  var posesSensesTmp = senseElement.findAllElements(key);
   senseEntities = posesSensesTmp.isEmpty ? senseEntities : posesSensesTmp.map((e) => e.text);
   if (senseEntities != null && senseEntities.isNotEmpty) {
     writeRelationToBuffer(buffer, entities, key, senseId, senseEntities, "sense_$key");
@@ -68,14 +68,11 @@ List<int> writeElementToBuffer(StringBuffer buffer, int idElement, int entSeq, i
   List<List<dynamic>> values = [];
   String tableName = type == 'k' ? 'kanji' : 'reading';
   for (var element in entry.findAllElements('${type}_ele')) {
-    String insertedIdPriority = "NULL";
-
     //info
     List<String> info = [];
     element.findAllElements('${type}e_inf').forEach((element) {
       info.add(element.innerText);
     });
-
     if (info.isNotEmpty) {
       writeRelationToBuffer(
           buffer, entities, "${type}e_inf", idElement, info, "${tableName}_${type}e_inf");
@@ -83,6 +80,7 @@ List<int> writeElementToBuffer(StringBuffer buffer, int idElement, int entSeq, i
 
     // priority
     Map<String, String> priority = parsePriorityElement(element, '${type}e_pri');
+    String insertedIdPriority = "NULL";
     if (priority.isNotEmpty) {
       writeInsertToBuffer(buffer, "priority", [[idPriority, priority['news'] ?? 'NULL', priority['ichi'] ?? 'NULL', priority['gai'] ?? 'NULL', priority['nf'] ?? 'NULL']]);
       insertedIdPriority = idPriority.toString();
@@ -109,7 +107,7 @@ void main(List<String> args) {
     final buffer = StringBuffer();
 
     writeInsertToBuffer(
-        buffer, "lang", langs.asMap().entries.map((e) => [e.key + 1, "'${e.value}'"]).toList());
+        buffer, "lang", langs.asMap().entries.map((e) => [e.key + 1, "'${e.value}'"]));
 
     print("parsing...");
     var document = XmlDocument.parse(contents);
