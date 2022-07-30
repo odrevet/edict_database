@@ -19,7 +19,7 @@ void writeEntityToBuffer(StringBuffer buffer, Map<String, List<Entity>> entities
         buffer,
         key,
         entities[key]!.map((e) => [e.id, "'${e.name}'", "'${escape(e.description)}'"]).toList(),
-        "(id, name, description)");
+        ["id", "name", "description"]);
 
 void writeRelationToBuffer(StringBuffer buffer, Map<String, List<Entity>> entities, String key,
     int id, entitiesToWrite, String tableName) {
@@ -197,13 +197,13 @@ void main(List<String> args) {
         }
 
         if (langs.contains(lang)) {
-          writeInsertToBuffer(
-              buffer,
-              "sense",
-              [
-                [idSense, entSeq, langs.indexOf(lang) + 1]
-              ],
-              "(id, id_expression, id_lang)");
+          writeInsertToBuffer(buffer, "sense", [
+            [idSense, entSeq, langs.indexOf(lang) + 1]
+          ], [
+            "id",
+            "id_expression",
+            "id_lang"
+          ]);
 
           poses = writeSenseRelationToBuffer(buffer, entities, "pos", sense, idSense, poses);
           misc = writeSenseRelationToBuffer(buffer, entities, "misc", sense, idSense, misc);
@@ -215,7 +215,7 @@ void main(List<String> args) {
           }
 
           if (glossValues.isNotEmpty) {
-            writeInsertToBuffer(buffer, "gloss", glossValues, "(id_sense, gloss)");
+            writeInsertToBuffer(buffer, "gloss", glossValues, ["id_sense", "gloss"]);
           }
 
           idSense++;
