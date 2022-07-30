@@ -162,7 +162,7 @@ void main(List<String> args) {
     // Entries
     for (var entry in entries) {
       int entSeq = int.parse(entry.findAllElements('ent_seq').first.text);
-      buffer.write('INSERT INTO expression values ($entSeq);\n');
+      buffer.write('INSERT INTO entry values ($entSeq);\n');
 
       // Kanji Elements
       idKanji = writeElementToBuffer(buffer, idKanji, entSeq, entry, entities, "k");
@@ -201,7 +201,7 @@ void main(List<String> args) {
             [idSense, entSeq, langs.indexOf(lang) + 1]
           ], [
             "id",
-            "id_expression",
+            "id_entry",
             "id_lang"
           ]);
 
@@ -223,7 +223,7 @@ void main(List<String> args) {
       }
     }
 
-    final String filenameExpression = 'data/generated/sql/expression.sql';
-    File(filenameExpression).writeAsStringSync(buffer.toString());
+    final String filenameentry = 'data/generated/sql/expression.sql';
+    File(filenameentry).writeAsStringSync(buffer.toString());
   });
 }

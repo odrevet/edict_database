@@ -3,16 +3,16 @@ CREATE TABLE lang(
     iso3 STRING
 );
 
-CREATE TABLE expression(
+CREATE TABLE entry(
     id INTEGER PRIMARY KEY
 );
 
 CREATE TABLE reading(
     id INTEGER PRIMARY KEY,
-    id_expression INTEGER,
+    id_entry INTEGER,
     id_priority INTEGER,
     reading STRING,
-    FOREIGN KEY(id_expression) REFERENCES expression(id),
+    FOREIGN KEY(id_entry) REFERENCES entry(id),
     FOREIGN KEY(id_priority) REFERENCES priority(id)
 );
 
@@ -20,10 +20,10 @@ CREATE INDEX idx_reading ON reading(reading);
 
 CREATE TABLE kanji(
     id INTEGER PRIMARY KEY,
-    id_expression INTEGER,
+    id_entry INTEGER,
     id_priority INTEGER,
     kanji STRING,
-    FOREIGN KEY(id_expression) REFERENCES expression(id),
+    FOREIGN KEY(id_entry) REFERENCES entry(id),
     FOREIGN KEY(id_priority) REFERENCES priority(id)
 );
 
@@ -39,9 +39,9 @@ CREATE INDEX idx_kanji ON kanji(kanji);
 
 CREATE TABLE sense(
     id INTEGER PRIMARY KEY,
-    id_expression INTEGER,
+    id_entry INTEGER,
     id_lang INTEGER,
-    FOREIGN KEY(id_expression) REFERENCES expression(id),
+    FOREIGN KEY(id_entry) REFERENCES entry(id),
     FOREIGN KEY(id_lang) REFERENCES lang(id)
 );
 
