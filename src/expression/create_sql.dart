@@ -24,12 +24,11 @@ void writeEntityToBuffer(StringBuffer buffer, Map<String, List<Entity>> entities
 
 void writeRelationToBuffer(StringBuffer buffer, Map<String, List<Entity>> entities, String key,
     int id, entitiesToWrite, String tableName) {
-  List<String> relations = [];
+  List<List<dynamic>> relations = [];
   entitiesToWrite.forEach((entryEntity) {
     String entryEntityStr = entryEntity.trim();
     entryEntityStr = entryEntityStr.substring(1, entryEntityStr.length - 1); //remove & and ;
-    relations
-        .add("($id, ${entities[key]!.firstWhere((element) => element.name == entryEntityStr).id})");
+    relations.add([id, entities[key]!.firstWhere((element) => element.name == entryEntityStr).id]);
   });
 
   writeInsertToBuffer(buffer, tableName, relations);
@@ -65,12 +64,12 @@ Map<String, String> parsePriorityElement(XmlElement parent, String tagName) {
   return priority;
 }
 
-int writeElementToBuffer(
-    StringBuffer buffer, int idElement, int entSeq, XmlElement entry, Map<String, List<Entity>> entities, String type) {
-  List<String> values = [];
+int writeElementToBuffer(StringBuffer buffer, int idElement, int entSeq, XmlElement entry,
+    Map<String, List<Entity>> entities, String type) {
+  List<List<dynamic>> values = [];
   String tableName = type == 'k' ? 'kanji' : 'reading';
   for (var element in entry.findAllElements('${type}_ele')) {
-    values.add("($idElement, $entSeq, NULL, '${element.findElements("${type}eb").first.text}')");
+    values.add([idElement, entSeq, 'NULL', "'${element.findElements("${type}eb").first.text}'"]);
 
     //info
     List<String> info = [];
@@ -79,8 +78,8 @@ int writeElementToBuffer(
     });
 
     if (info.isNotEmpty) {
-      writeRelationToBuffer(buffer, entities, "${type}e_inf", idElement, info,
-          "${tableName}_${type}e_inf");
+      writeRelationToBuffer(
+          buffer, entities, "${type}e_inf", idElement, info, "${tableName}_${type}e_inf");
     }
 
     // priority
@@ -207,9 +206,9 @@ void main(List<String> args) {
           misc = writeSenseRelationToBuffer(buffer, entities, "misc", sense, idSense, misc);
           dial = writeSenseRelationToBuffer(buffer, entities, "dial", sense, idSense, dial);
 
-          var glossValues = <String>[];
+          List<List<dynamic>> glossValues = [];
           for (var gloss in glosses) {
-            glossValues.add("($idSense, '${escape(gloss.text)}')");
+            glossValues.add([idSense, "'${escape(gloss.text)}'"]);
           }
 
           if (glossValues.isNotEmpty) {

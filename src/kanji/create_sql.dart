@@ -6,7 +6,6 @@ import 'package:xml/xml.dart';
 import 'kanji.dart';
 import '../common.dart';
 
-
 void main(List<String> args) async {
   // langs to process are passed as arguments. No arguments means all languages
   List<String> langs = args;
@@ -114,34 +113,38 @@ void main(List<String> args) async {
           "INSERT INTO kanji VALUES ('${kanji.character}', ${kanji.stroke}, ${kanji.freq}, ${kanji.jlpt});\n");
 
       if (kanji.radicals.isNotEmpty) {
-        var values = <String>[];
+        List<List<dynamic>> values = [];
         for (var radical in kanji.radicals) {
-          values.add("('${kanji.character}', '$radical')");
+          values.add(["'${kanji.character}'", "'$radical'"]);
         }
         writeInsertToBuffer(buffer, "kanji_radical", values);
       }
 
       if (kanji.on.isNotEmpty) {
-        var values = <String>[];
+        List<List<dynamic>> values = [];
         for (var on in kanji.on) {
-          values.add("(NULL, '${kanji.character}', '$on')");
+          values.add(["NULL", "'${kanji.character}'", "'$on'"]);
         }
         writeInsertToBuffer(buffer, "on_yomi", values);
       }
 
       if (kanji.kun.isNotEmpty) {
-        var values = <String>[];
+        List<List<dynamic>> values = [];
         for (var kun in kanji.kun) {
-          values.add(" (NULL, '${kanji.character}', '$kun')");
+          values.add(["NULL", "'${kanji.character}'", "'$kun'"]);
         }
         writeInsertToBuffer(buffer, "kun_yomi", values);
       }
 
       if (kanji.meanings.isNotEmpty) {
-        var values = <String>[];
+        List<List<dynamic>> values = [];
         for (var meaning in kanji.meanings) {
-          values
-              .add("(NULL, '${kanji.character}', '${escape(meaning.meaning)}', '${meaning.lang}')");
+          values.add([
+            "NULL",
+            "'${kanji.character}'",
+            "'${escape(meaning.meaning)}'",
+            "'${meaning.lang}'"
+          ]);
         }
         writeInsertToBuffer(buffer, "meaning", values);
       }
