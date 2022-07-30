@@ -14,13 +14,12 @@ class Entity {
   Entity({required this.id, required this.type, required this.name, required this.description});
 }
 
-void writeEntityToBuffer(StringBuffer buffer, Map<String, List<Entity>> entities, String key) {
-  if (entities[key] != null) {
-    buffer.write("INSERT INTO $key (id, name, description) VALUES \n");
-    buffer.writeAll(entities[key]!.map((e) => '(${e.id}, "${e.name}", "${e.description}")'), ",\n");
-    buffer.write(";\n");
-  }
-}
+void writeEntityToBuffer(StringBuffer buffer, Map<String, List<Entity>> entities, String key) =>
+    writeInsertToBuffer(
+        buffer,
+        key,
+        entities[key]!.map((e) => [e.id, "'${e.name}'", "'${e.description}'"]).toList(),
+        "(id, name, description)");
 
 void writeRelationToBuffer(StringBuffer buffer, Map<String, List<Entity>> entities, String key,
     int id, entitiesToWrite, String tableName) {
@@ -107,9 +106,8 @@ void main(List<String> args) {
   File('data/JMdict').readAsString().then((String contents) {
     final buffer = StringBuffer();
 
-    buffer.write("INSERT INTO lang VALUES \n");
-    buffer.writeAll(langs.asMap().entries.map((e) => '(${e.key + 1}, "${e.value}")'), ",");
-    buffer.write(";\n");
+    writeInsertToBuffer(
+        buffer, "lang", langs.asMap().entries.map((e) => [e.key + 1, "'${e.value}'"]).toList());
 
     print("parsing...");
     var document = XmlDocument.parse(contents);
