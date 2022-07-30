@@ -197,8 +197,13 @@ void main(List<String> args) {
         }
 
         if (langs.contains(lang)) {
-          buffer.write(
-              "INSERT INTO sense (id, id_expression, id_lang) VALUES ($idSense, $entSeq, ${langs.indexOf(lang) + 1});\n");
+          writeInsertToBuffer(
+              buffer,
+              "sense",
+              [
+                [idSense, entSeq, langs.indexOf(lang) + 1]
+              ],
+              "(id, id_expression, id_lang)");
 
           poses = writeSenseRelationToBuffer(buffer, entities, "pos", sense, idSense, poses);
           misc = writeSenseRelationToBuffer(buffer, entities, "misc", sense, idSense, misc);
