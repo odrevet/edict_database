@@ -63,12 +63,12 @@ Map<String, String> parsePriorityElement(XmlElement parent, String tagName) {
   return priority;
 }
 
-int writeElementToBuffer(StringBuffer buffer, int idElement, int entSeq, XmlElement entry,
+List<int> writeElementToBuffer(StringBuffer buffer, int idElement, int entSeq, int idPriority,XmlElement entry,
     Map<String, List<Entity>> entities, String type) {
   List<List<dynamic>> values = [];
   String tableName = type == 'k' ? 'kanji' : 'reading';
   for (var element in entry.findAllElements('${type}_ele')) {
-    values.add([idElement, entSeq, 'NULL', "'${element.findElements("${type}eb").first.text}'"]);
+    String insertedIdPriority = "NULL";
 
     //info
     List<String> info = [];
@@ -82,12 +82,14 @@ int writeElementToBuffer(StringBuffer buffer, int idElement, int entSeq, XmlElem
     }
 
     // priority
-    /*Map<String, String> priority = parsePriorityElement(element, '${type}e_pri');
+    Map<String, String> priority = parsePriorityElement(element, '${type}e_pri');
     if (priority.isNotEmpty) {
-      buffer.write(
-          "INSERT INTO priority VALUES ($idPriority, ${priority['news'] ?? 'NULL'}, ${priority['ichi'] ?? 'NULL'}, ${priority['gai'] ?? 'NULL'}, ${priority['nf'] ?? 'NULL'});\n");
+      writeInsertToBuffer(buffer, "priority", [[idPriority, priority['news'] ?? 'NULL', priority['ichi'] ?? 'NULL', priority['gai'] ?? 'NULL', priority['nf'] ?? 'NULL']]);
+      insertedIdPriority = idPriority.toString();
       idPriority++;
-    }*/
+    }
+
+    values.add([idElement, entSeq, insertedIdPriority, "'${element.findElements("${type}eb").first.text}'"]);
 
     idElement++;
   }
@@ -96,7 +98,7 @@ int writeElementToBuffer(StringBuffer buffer, int idElement, int entSeq, XmlElem
     writeInsertToBuffer(buffer, tableName, values);
   }
 
-  return idElement;
+  return [idElement, idPriority];
 }
 
 void main(List<String> args) {
@@ -165,10 +167,15 @@ void main(List<String> args) {
       buffer.write('INSERT INTO entry values ($entSeq);\n');
 
       // Kanji Elements
-      idKanji = writeElementToBuffer(buffer, idKanji, entSeq, entry, entities, "k");
+      List<int> ids = [];
+      ids = writeElementToBuffer(buffer, idKanji, entSeq, idPriority,entry, entities, "k");
+      idKanji = ids[0];
+      idPriority = ids[1];
 
       // Reading Elements
-      idReading = writeElementToBuffer(buffer, idReading, entSeq, entry, entities, "r");
+      ids = writeElementToBuffer(buffer, idReading, entSeq, idPriority,entry, entities, "r");
+      idReading = ids[0];
+      idPriority = ids[1];
 
       // Senses
       Iterable<String>? poses;
