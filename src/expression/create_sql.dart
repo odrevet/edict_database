@@ -22,20 +22,30 @@ void writeEntityToBuffer(StringBuffer buffer, Map<String, List<Entity>> entities
   }
 }
 
-void writeRelationToBuffer(StringBuffer buffer, Map<String, List<Entity>> entities,
-    String key, int id, entitiesToWrite, String tableName) {
+void writeRelationToBuffer(StringBuffer buffer, Map<String, List<Entity>> entities, String key,
+    int id, entitiesToWrite, String tableName) {
   List<String> relations = [];
   entitiesToWrite.forEach((entryEntity) {
     String entryEntityStr = entryEntity.trim();
     entryEntityStr = entryEntityStr.substring(1, entryEntityStr.length - 1); //remove & and ;
-    relations.add(
-        "($id, ${entities[key]!.firstWhere((element) => element.name == entryEntityStr).id})");
+    relations
+        .add("($id, ${entities[key]!.firstWhere((element) => element.name == entryEntityStr).id})");
   });
 
   writeInsertToBuffer(buffer, tableName, relations);
 }
 
-Map<String, String> parsePriorityElement(XmlElement parent, String tagName){
+dynamic writeSenseRelationToBuffer(StringBuffer buffer, Map<String, List<Entity>> entities,
+    String key, XmlElement senseElement, int senseId, dynamic senseEntities) {
+  var posesSensesTmp = senseElement.findAllElements(key).toList();
+  senseEntities = posesSensesTmp.isEmpty ? senseEntities : posesSensesTmp.map((e) => e.text);
+  if (senseEntities != null && senseEntities.isNotEmpty) {
+    writeRelationToBuffer(buffer, entities, key, senseId, senseEntities, "sense_$key");
+  }
+  return senseEntities;
+}
+
+Map<String, String> parsePriorityElement(XmlElement parent, String tagName) {
   Map<String, String> priority = {};
   parent.findAllElements(tagName).forEach((priorityElement) {
     RegExp exp = RegExp(r'(\w+?)(\d+)');
@@ -207,23 +217,9 @@ void main(List<String> args) {
           buffer.write(
               "INSERT INTO sense (id, id_expression, id_lang) VALUES ($senseId, $entSeq, ${langs.indexOf(lang) + 1});\n");
 
-          var posesSensesTmp = sense.findAllElements('pos').toList();
-          poses = posesSensesTmp.isEmpty ? poses : posesSensesTmp.map((e) => e.text);
-          if (poses != null && poses.isNotEmpty) {
-            writeRelationToBuffer(buffer, entities, "pos", senseId, poses, "sense_pos");
-          }
-
-          var miscSensesTmp = sense.findAllElements('misc').toList();
-          misc = miscSensesTmp.isEmpty ? misc : miscSensesTmp.map((e) => e.text);
-          if (misc != null && misc.isNotEmpty) {
-            writeRelationToBuffer(buffer, entities, "misc", senseId, misc, "sense_misc");
-          }
-
-          var dialSensesTmp = sense.findAllElements('dial').toList();
-          dial = dialSensesTmp.isEmpty ? dial : dialSensesTmp.map((e) => e.text);
-          if (dial != null && dial.isNotEmpty) {
-            writeRelationToBuffer(buffer, entities, "dial", senseId, dial, "sense_dial");
-          }
+          poses = writeSenseRelationToBuffer(buffer, entities, "pos", sense, senseId, poses);
+          misc = writeSenseRelationToBuffer(buffer, entities, "misc", sense, senseId, misc);
+          dial = writeSenseRelationToBuffer(buffer, entities, "dial", sense, senseId, dial);
 
           var glossValues = <String>[];
           for (var gloss in glosses) {
