@@ -22,33 +22,18 @@ void writeEntityToBuffer(StringBuffer buffer, Map<String, List<Entity>> entities
   }
 }
 
-void writeEntryEntityRelationToBuffer(StringBuffer buffer, Map<String, List<Entity>> entities,
-    String key, int entryId, entryEntities, String tableName) {
+void writeRelationToBuffer(StringBuffer buffer, Map<String, List<Entity>> entities,
+    String key, int id, entitiesToWrite, String tableName) {
   List<String> relations = [];
-  entryEntities.forEach((entryEntity) {
+  entitiesToWrite.forEach((entryEntity) {
     String entryEntityStr = entryEntity.trim();
     entryEntityStr = entryEntityStr.substring(1, entryEntityStr.length - 1); //remove & and ;
     relations.add(
-        "($entryId, ${entities[key]!.firstWhere((element) => element.name == entryEntityStr).id})");
+        "($id, ${entities[key]!.firstWhere((element) => element.name == entryEntityStr).id})");
   });
 
   writeInsertToBuffer(buffer, tableName, relations);
 }
-
-void writeSenseEntityRelationToBuffer(StringBuffer buffer, Map<String, List<Entity>> entities,
-    String key, int senseId, senseEntities) {
-  List<String> relations = [];
-  senseEntities.forEach((senseEntity) {
-    String senseEntityStr = senseEntity.trim();
-    senseEntityStr = senseEntityStr.substring(1, senseEntityStr.length - 1); //remove & and ;
-    relations.add(
-        "($senseId, ${entities[key]!.firstWhere((element) => element.name == senseEntityStr).id})");
-  });
-
-  writeInsertToBuffer(buffer, "sense_$key", relations);
-}
-
-
 
 Map<String, String> parsePriorityElement(XmlElement parent, String tagName){
   Map<String, String> priority = {};
@@ -145,7 +130,7 @@ void main(List<String> args) {
         });
 
         if (info.isNotEmpty) {
-          writeEntryEntityRelationToBuffer(buffer, entities, "ke_inf", kId, info, "kanji_ke_inf");
+          writeRelationToBuffer(buffer, entities, "ke_inf", kId, info, "kanji_ke_inf");
         }
 
         // priority
@@ -175,7 +160,7 @@ void main(List<String> args) {
         });
 
         if (info.isNotEmpty) {
-          writeEntryEntityRelationToBuffer(buffer, entities, "re_inf", rId, info, "reading_re_inf");
+          writeRelationToBuffer(buffer, entities, "re_inf", rId, info, "reading_re_inf");
         }
         rId++;
 
@@ -225,19 +210,19 @@ void main(List<String> args) {
           var posesSensesTmp = sense.findAllElements('pos').toList();
           poses = posesSensesTmp.isEmpty ? poses : posesSensesTmp.map((e) => e.text);
           if (poses != null && poses.isNotEmpty) {
-            writeSenseEntityRelationToBuffer(buffer, entities, "pos", senseId, poses);
+            writeRelationToBuffer(buffer, entities, "pos", senseId, poses, "sense_pos");
           }
 
           var miscSensesTmp = sense.findAllElements('misc').toList();
           misc = miscSensesTmp.isEmpty ? misc : miscSensesTmp.map((e) => e.text);
           if (misc != null && misc.isNotEmpty) {
-            writeSenseEntityRelationToBuffer(buffer, entities, "misc", senseId, misc);
+            writeRelationToBuffer(buffer, entities, "misc", senseId, misc, "sense_misc");
           }
 
           var dialSensesTmp = sense.findAllElements('dial').toList();
           dial = dialSensesTmp.isEmpty ? dial : dialSensesTmp.map((e) => e.text);
           if (dial != null && dial.isNotEmpty) {
-            writeSenseEntityRelationToBuffer(buffer, entities, "dial", senseId, dial);
+            writeRelationToBuffer(buffer, entities, "dial", senseId, dial, "sense_dial");
           }
 
           var glossValues = <String>[];
