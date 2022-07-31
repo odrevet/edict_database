@@ -27,6 +27,16 @@ CREATE TABLE kanji(
     FOREIGN KEY(id_priority) REFERENCES priority(id)
 );
 
+CREATE INDEX idx_kanji ON kanji(kanji);
+
+CREATE TABLE reading_kanji(
+    id_reading INTEGER,
+    id_kanji INTEGER,
+    FOREIGN KEY(id_reading) REFERENCES reading(id),
+    FOREIGN KEY(id_kanji) REFERENCES kanji(id),
+    PRIMARY KEY (id_reading, id_kanji)
+);
+
 CREATE TABLE priority(
     id INTEGER PRIMARY KEY,
     news INTEGER,
@@ -34,8 +44,6 @@ CREATE TABLE priority(
     gai INTEGER,
     nf INTEGER
 );
-
-CREATE INDEX idx_kanji ON kanji(kanji);
 
 CREATE TABLE sense(
     id INTEGER PRIMARY KEY,
