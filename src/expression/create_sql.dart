@@ -105,7 +105,7 @@ List<int> writeElementToBuffer(StringBuffer buffer, int idElement, int entSeq, i
     if (type == "r") {
       for (var readingKanji in element.findAllElements('re_restr')) {
         buffer.write(
-            "INSERT INTO reading_kanji SELECT $idElement, kanji.id FROM kanji WHERE id_entry = $entSeq AND kanji.kanji = '${readingKanji.text}';\n");
+            "UPDATE kanji SET id_reading = $idElement WHERE id_entry = $entSeq AND kanji.kanji = '${readingKanji.text}';\n");
       }
     }
 
@@ -113,7 +113,7 @@ List<int> writeElementToBuffer(StringBuffer buffer, int idElement, int entSeq, i
   }
 
   if (values.isNotEmpty) {
-    writeInsertToBuffer(buffer, tableName, values);
+    writeInsertToBuffer(buffer, tableName, values, ["id", "id_entry", "id_priority", tableName]);
   }
 
   return [idElement, idPriority];

@@ -21,6 +21,7 @@ CREATE INDEX idx_reading ON reading(reading);
 CREATE TABLE kanji(
     id INTEGER PRIMARY KEY,
     id_entry INTEGER,
+    id_reading INTEGER,
     id_priority INTEGER,
     kanji STRING,
     FOREIGN KEY(id_entry) REFERENCES entry(id),
@@ -28,14 +29,6 @@ CREATE TABLE kanji(
 );
 
 CREATE INDEX idx_kanji ON kanji(kanji);
-
-CREATE TABLE reading_kanji(
-    id_reading INTEGER,
-    id_kanji INTEGER,
-    FOREIGN KEY(id_reading) REFERENCES reading(id),
-    FOREIGN KEY(id_kanji) REFERENCES kanji(id),
-    PRIMARY KEY (id_reading, id_kanji)
-);
 
 CREATE TABLE priority(
     id INTEGER PRIMARY KEY,
