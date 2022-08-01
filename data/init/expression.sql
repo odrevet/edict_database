@@ -7,30 +7,30 @@ CREATE TABLE entry(
     id INTEGER PRIMARY KEY
 );
 
-CREATE TABLE reading(
+CREATE TABLE r_ele(
     id INTEGER PRIMARY KEY,
     id_entry INTEGER,
-    id_priority INTEGER,
-    reading STRING,
+    id_pri INTEGER,
+    reb STRING,
     FOREIGN KEY(id_entry) REFERENCES entry(id),
-    FOREIGN KEY(id_priority) REFERENCES priority(id)
+    FOREIGN KEY(id_pri) REFERENCES pri(id)
 );
 
-CREATE INDEX idx_reading ON reading(reading);
+CREATE INDEX idx_r_ele ON r_ele(reb);
 
-CREATE TABLE kanji(
+CREATE TABLE k_ele(
     id INTEGER PRIMARY KEY,
     id_entry INTEGER,
-    id_reading INTEGER,
-    id_priority INTEGER,
-    kanji STRING,
+    id_r_ele INTEGER,
+    id_pri INTEGER,
+    keb STRING,
     FOREIGN KEY(id_entry) REFERENCES entry(id),
-    FOREIGN KEY(id_priority) REFERENCES priority(id)
+    FOREIGN KEY(id_pri) REFERENCES pri(id)
 );
 
-CREATE INDEX idx_kanji ON kanji(kanji);
+CREATE INDEX idx_k_ele ON k_ele(keb);
 
-CREATE TABLE priority(
+CREATE TABLE pri(
     id INTEGER PRIMARY KEY,
     news INTEGER,
     ichi INTEGER,
@@ -101,12 +101,12 @@ CREATE TABLE ke_inf(
     description STRING
 );
 
-CREATE TABLE kanji_ke_inf(
-    id_kanji INTEGER,
+CREATE TABLE k_ele_ke_inf(
+    id_k_ele INTEGER,
     id_ke_inf INTEGER,
-    FOREIGN KEY(id_kanji) REFERENCES kanji(id),
+    FOREIGN KEY(id_k_ele) REFERENCES k_ele(id),
     FOREIGN KEY(id_ke_inf) REFERENCES ke_inf(id),
-    PRIMARY KEY (id_kanji, id_ke_inf)
+    PRIMARY KEY (id_k_ele, id_ke_inf)
 );
 
 CREATE TABLE re_inf(
@@ -115,10 +115,10 @@ CREATE TABLE re_inf(
     description STRING
 );
 
-CREATE TABLE reading_re_inf(
-    id_reading INTEGER,
+CREATE TABLE r_ele_re_inf(
+    id_r_ele INTEGER,
     id_re_inf INTEGER,
-    FOREIGN KEY(id_reading) REFERENCES reading(id),
+    FOREIGN KEY(id_r_ele) REFERENCES r_ele(id),
     FOREIGN KEY(id_re_inf) REFERENCES re_inf(id),
-    PRIMARY KEY (id_reading, id_re_inf)
+    PRIMARY KEY (id_r_ele, id_re_inf)
 );

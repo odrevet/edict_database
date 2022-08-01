@@ -66,7 +66,7 @@ Map<String, String> parsePriorityElement(XmlElement parent, String tagName) {
 List<int> writeElementToBuffer(StringBuffer buffer, int idElement, int entSeq, int idPriority,
     XmlElement entry, Map<String, List<Entity>> entities, String type) {
   List<List<dynamic>> values = [];
-  String tableName = type == 'k' ? 'kanji' : 'reading';
+  String tableName = '${type}_ele';
   for (var element in entry.findAllElements('${type}_ele')) {
     //info
     List<String> info = [];
@@ -82,7 +82,7 @@ List<int> writeElementToBuffer(StringBuffer buffer, int idElement, int entSeq, i
     Map<String, String> priority = parsePriorityElement(element, '${type}e_pri');
     String insertedIdPriority = "NULL";
     if (priority.isNotEmpty) {
-      writeInsertToBuffer(buffer, "priority", [
+      writeInsertToBuffer(buffer, "pri", [
         [
           idPriority,
           priority['news'] ?? 'NULL',
@@ -105,7 +105,7 @@ List<int> writeElementToBuffer(StringBuffer buffer, int idElement, int entSeq, i
     if (type == "r") {
       for (var readingKanji in element.findAllElements('re_restr')) {
         buffer.write(
-            "UPDATE kanji SET id_reading = $idElement WHERE id_entry = $entSeq AND kanji.kanji = '${readingKanji.text}';\n");
+            "UPDATE k_ele SET id_r_ele = $idElement WHERE id_entry = $entSeq AND k_ele.keb = '${readingKanji.text}';\n");
       }
     }
 
@@ -113,7 +113,7 @@ List<int> writeElementToBuffer(StringBuffer buffer, int idElement, int entSeq, i
   }
 
   if (values.isNotEmpty) {
-    writeInsertToBuffer(buffer, tableName, values, ["id", "id_entry", "id_priority", tableName]);
+    writeInsertToBuffer(buffer, tableName, values, ["id", "id_entry", "id_pri", "${type}eb"]);
   }
 
   return [idElement, idPriority];
