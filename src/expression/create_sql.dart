@@ -88,6 +88,7 @@ List<int> writeElementToBuffer(StringBuffer buffer, int idElement, int entSeq, i
           idElement,
           priority['news'] ?? 'NULL',
           priority['ichi'] ?? 'NULL',
+          priority['spec'] ?? 'NULL',
           priority['gai'] ?? 'NULL',
           priority['nf'] ?? 'NULL'
         ]

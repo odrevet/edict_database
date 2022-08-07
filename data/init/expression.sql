@@ -36,6 +36,7 @@ CREATE TABLE pri(
     id_entry INTEGER,
     news INTEGER,
     ichi INTEGER,
+    spec INTEGER,
     gai INTEGER,
     nf INTEGER,
     FOREIGN KEY(id_entry) REFERENCES entry(id)
