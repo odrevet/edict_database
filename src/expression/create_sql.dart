@@ -85,6 +85,7 @@ List<int> writeElementToBuffer(StringBuffer buffer, int idElement, int entSeq, i
       writeInsertToBuffer(buffer, "pri", [
         [
           idPriority,
+          idElement,
           priority['news'] ?? 'NULL',
           priority['ichi'] ?? 'NULL',
           priority['gai'] ?? 'NULL',
@@ -248,7 +249,7 @@ void main(List<String> args) {
       }
     }
 
-    final String filenameentry = 'data/generated/sql/expression.sql';
-    File(filenameentry).writeAsStringSync(buffer.toString());
+    final String filenameEntry = 'data/generated/sql/expression.sql';
+    File(filenameEntry).writeAsStringSync(buffer.toString());
   });
 }

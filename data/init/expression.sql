@@ -25,6 +25,7 @@ CREATE TABLE k_ele(
     id_pri INTEGER,
     keb STRING,
     FOREIGN KEY(id_entry) REFERENCES entry(id),
+    FOREIGN KEY(id_r_ele) REFERENCES r_ele(id),
     FOREIGN KEY(id_pri) REFERENCES pri(id)
 );
 
@@ -32,10 +33,12 @@ CREATE INDEX idx_k_ele ON k_ele(keb);
 
 CREATE TABLE pri(
     id INTEGER PRIMARY KEY,
+    id_entry INTEGER,
     news INTEGER,
     ichi INTEGER,
     gai INTEGER,
-    nf INTEGER
+    nf INTEGER,
+    FOREIGN KEY(id_entry) REFERENCES entry(id)
 );
 
 CREATE TABLE sense(
