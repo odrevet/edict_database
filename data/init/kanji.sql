@@ -41,6 +41,8 @@ CREATE TABLE on_yomi(
     FOREIGN KEY(id_kanji) REFERENCES kanji(id)
 );
 
+CREATE INDEX idx_on_yomi_reading ON on_yomi(reading);
+
 CREATE TABLE kun_yomi(
     id INTEGER PRIMARY KEY,
     id_kanji STRING,
@@ -48,9 +50,13 @@ CREATE TABLE kun_yomi(
     FOREIGN KEY(id_kanji) REFERENCES kanji(id)
 );
 
-create table meaning(
+CREATE INDEX idx_kun_yomi_reading ON kun_yomi(reading);
+
+CREATE table meaning(
     id INTEGER PRIMARY KEY,
     id_kanji INTEGER,
     meaning STRING,
     lang STRING
 );
+
+CREATE INDEX idx_reading ON meaning(meaning);

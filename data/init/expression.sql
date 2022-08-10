@@ -16,7 +16,7 @@ CREATE TABLE r_ele(
     FOREIGN KEY(id_pri) REFERENCES pri(id)
 );
 
-CREATE INDEX idx_r_ele ON r_ele(reb);
+CREATE INDEX idx_reb ON r_ele(reb);
 
 CREATE TABLE k_ele(
     id INTEGER PRIMARY KEY,
@@ -29,7 +29,7 @@ CREATE TABLE k_ele(
     FOREIGN KEY(id_pri) REFERENCES pri(id)
 );
 
-CREATE INDEX idx_k_ele ON k_ele(keb);
+CREATE INDEX idx_keb ON k_ele(keb);
 
 CREATE TABLE pri(
     id INTEGER PRIMARY KEY,
@@ -56,6 +56,8 @@ CREATE TABLE gloss(
     gloss STRING,
     FOREIGN KEY(id_sense) REFERENCES sense(id)
 );
+
+CREATE INDEX idx_gloss ON gloss(gloss);
 
 CREATE TABLE pos(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
