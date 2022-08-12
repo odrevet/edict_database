@@ -277,11 +277,10 @@ void main(List<String> args) {
 
         if (langs.contains(lang)) {
           writeInsertToBuffer(buffer, "sense", [
-            [idSense, entSeq, langs.indexOf(lang) + 1]
+            [idSense, entSeq]
           ], [
             "id",
             "id_entry",
-            "id_lang"
           ]);
 
           poses = writeSenseRelationToBuffer(buffer, entities, "pos", sense, idSense, poses);
@@ -290,11 +289,11 @@ void main(List<String> args) {
 
           List<List<dynamic>> glossValues = [];
           for (var gloss in glosses) {
-            glossValues.add([idSense, "'${escape(gloss.text)}'"]);
+            glossValues.add([idSense, langs.indexOf(lang) + 1, "'${escape(gloss.text)}'"]);
           }
 
           if (glossValues.isNotEmpty) {
-            writeInsertToBuffer(buffer, "gloss", glossValues, ["id_sense", "gloss"]);
+            writeInsertToBuffer(buffer, "gloss", glossValues, ["id_sense", "id_lang", "content"]);
           }
 
           idSense++;

@@ -45,19 +45,19 @@ CREATE TABLE pri(
 CREATE TABLE sense(
     id INTEGER PRIMARY KEY,
     id_entry INTEGER,
-    id_lang INTEGER,
-    FOREIGN KEY(id_entry) REFERENCES entry(id),
-    FOREIGN KEY(id_lang) REFERENCES lang(id)
+    FOREIGN KEY(id_entry) REFERENCES entry(id)
 );
 
 CREATE TABLE gloss(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     id_sense INTEGER,
-    gloss STRING,
-    FOREIGN KEY(id_sense) REFERENCES sense(id)
+    id_lang INTEGER,
+    content STRING,
+    FOREIGN KEY(id_sense) REFERENCES sense(id),
+    FOREIGN KEY(id_lang) REFERENCES lang(id)
 );
 
-CREATE INDEX idx_gloss ON gloss(gloss);
+CREATE INDEX idx_gloss ON gloss(content);
 
 CREATE TABLE pos(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
