@@ -110,14 +110,14 @@ void main(List<String> args) async {
     //Generate the SQL from the List of Kanji
     for (var kanji in kanjis) {
       buffer.write(
-          "INSERT INTO kanji VALUES ('${kanji.character}', ${kanji.stroke}, ${kanji.freq}, ${kanji.jlpt});\n");
+          "INSERT INTO character VALUES ('${kanji.character}', ${kanji.stroke}, ${kanji.freq}, ${kanji.jlpt});\n");
 
       if (kanji.radicals.isNotEmpty) {
         List<List<dynamic>> values = [];
         for (var radical in kanji.radicals) {
           values.add(["'${kanji.character}'", "'$radical'"]);
         }
-        writeInsertToBuffer(buffer, "kanji_radical", values);
+        writeInsertToBuffer(buffer, "character_radical", values);
       }
 
       if (kanji.on.isNotEmpty) {
@@ -148,8 +148,8 @@ void main(List<String> args) async {
         }
         writeInsertToBuffer(buffer, "meaning", values);
       }
-
-      File(filename).writeAsStringSync(buffer.toString());
     }
+
+    File(filename).writeAsStringSync(buffer.toString());
   });
 }
