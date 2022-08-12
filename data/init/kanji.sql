@@ -5,7 +5,7 @@ CREATE TABLE lang(
 
 CREATE TABLE character(
     id STRING PRIMARY KEY,
-    stroke INTEGER,
+    stroke_count INTEGER,
     freq INTEGER,
     jlpt INTEGER
 );
