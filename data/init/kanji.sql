@@ -14,7 +14,7 @@ CREATE TABLE character(
 INSERT INTO character (id, stroke_count) VALUES('｜', 1),('ノ', 1),('ハ', 2),('マ', 2),('ユ', 2),('ヨ', 3);
 
 CREATE VIEW radical AS
-SELECT id, stroke FROM character WHERE id IN (
+SELECT id, stroke_count FROM character WHERE id IN (
 '一','｜','丶','ノ','乙','亅','二','亠','人','化','个','儿','入','ハ','并','冂','冖','冫','几','凵',
 '刀','刈','力','勹','匕','匚','十','卜','卩','厂','厶','又','マ','九','ユ','乃','込','口','囗','土',
 '士','夂','夕','大','女','子','宀','寸','小','尚','尢','尸','屮','山','川','巛','工','已','巾','干',
