@@ -186,7 +186,7 @@ void main(List<String> args) {
 
       ls.convert(doctypeElement.internalSubset!).forEach((element) {
         RegExp exp = RegExp(r'ENTITY (.*) "(.*)"');
-        RegExp expType = RegExp(r'<!-- <(.*)> \((.*)\) entities -->');
+        RegExp expType = RegExp(r'<!-- <(.*)>.*entities -->');
 
         if (expType.hasMatch(element)) {
           Iterable<RegExpMatch> matches = expType.allMatches(element);
@@ -212,6 +212,7 @@ void main(List<String> args) {
       writeEntityToBuffer(buffer, entities, "dial");
       writeEntityToBuffer(buffer, entities, "misc");
       writeEntityToBuffer(buffer, entities, "pos");
+      writeEntityToBuffer(buffer, entities, "field");
       writeEntityToBuffer(buffer, entities, "ke_inf");
       writeEntityToBuffer(buffer, entities, "re_inf");
     }
@@ -243,6 +244,7 @@ void main(List<String> args) {
       Iterable<String>? poses;
       Iterable<String>? misc;
       Iterable<String>? dial;
+      Iterable<String>? field;
 
       var senses = entry.findAllElements('sense');
 
@@ -276,6 +278,7 @@ void main(List<String> args) {
           poses = writeSenseRelationToBuffer(buffer, entities, "pos", sense, idSense, poses);
           misc = writeSenseRelationToBuffer(buffer, entities, "misc", sense, idSense, misc);
           dial = writeSenseRelationToBuffer(buffer, entities, "dial", sense, idSense, dial);
+          field = writeSenseRelationToBuffer(buffer, entities, "field", sense, idSense, field);
 
           List<List<dynamic>> glossValues = [];
           for (var gloss in glosses) {

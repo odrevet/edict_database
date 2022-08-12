@@ -101,6 +101,20 @@ CREATE TABLE sense_dial(
     PRIMARY KEY (id_sense, id_dial)
 );
 
+CREATE TABLE field(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name STRING,
+    description STRING
+);
+
+CREATE TABLE sense_field(
+    id_sense INTEGER,
+    id_field INTEGER,
+    FOREIGN KEY(id_sense) REFERENCES sense(id),
+    FOREIGN KEY(id_field) REFERENCES field(id),
+    PRIMARY KEY (id_sense, id_field)
+);
+
 CREATE TABLE ke_inf(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name STRING,
