@@ -21,17 +21,14 @@ void writeEntityToBuffer(StringBuffer buffer, Map<String, List<Entity>> entities
         entities[key]!.map((e) => [e.id, "'${e.name}'", "'${escape(e.description)}'"]),
         ["id", "name", "description"]);
 
+/// write sense relation table (e.g sense_misc, sense_pos, sense_dial)
 void writeRelationToBuffer(StringBuffer buffer, Map<String, List<Entity>> entities, String key,
-    int id, entitiesToWrite, String tableName) {
-  List<List<dynamic>> relations = [];
-  entitiesToWrite.forEach((entryEntity) {
-    String entryEntityStr = entryEntity.trim();
-    entryEntityStr = entryEntityStr.substring(1, entryEntityStr.length - 1); //remove & and ;
-    relations.add([id, entities[key]!.firstWhere((element) => element.name == entryEntityStr).id]);
-  });
-
-  writeInsertToBuffer(buffer, tableName, relations);
-}
+        int id, Iterable<String> entitiesToWrite, String tableName) =>
+    writeInsertToBuffer(buffer, tableName, entitiesToWrite.map((entity) {
+      String entryEntityStr = entity.trim();
+      entryEntityStr = entryEntityStr.substring(1, entryEntityStr.length - 1); //remove & and ;
+      return [id, entities[key]!.firstWhere((element) => element.name == entryEntityStr).id];
+    }));
 
 Iterable<String>? writeSenseRelationToBuffer(
     StringBuffer buffer,
@@ -82,14 +79,8 @@ Map<String, String> bindElementReRestr(XmlElement entry) {
   return reRestrHash;
 }
 
-List<int> writeElementToBuffer(
-    StringBuffer buffer,
-    int idElement,
-    int entSeq,
-    int idPriority,
-    XmlElement entry,
-    Map<String, List<Entity>> entities,
-    String type) {
+List<int> writeElementToBuffer(StringBuffer buffer, int idElement, int entSeq, int idPriority,
+    XmlElement entry, Map<String, List<Entity>> entities, String type) {
   List<List<dynamic>> values = [];
   String tableName = '${type}_ele';
   for (var element in entry.findAllElements('${type}_ele')) {
@@ -244,8 +235,7 @@ void main(List<String> args) {
       idPriority = ids[1];
 
       // Kanji Elements
-      ids = writeElementToBuffer(
-          buffer, idKanji, entSeq, idPriority, entry, entities, "k");
+      ids = writeElementToBuffer(buffer, idKanji, entSeq, idPriority, entry, entities, "k");
       idKanji = ids[0];
       idPriority = ids[1];
 
