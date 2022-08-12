@@ -1,6 +1,9 @@
-PRAGMA foreign_keys = ON;
+CREATE TABLE lang(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    iso2 STRING
+);
 
-CREATE TABLE kanji(
+CREATE TABLE character(
     id STRING PRIMARY KEY,
     stroke INTEGER,
     freq INTEGER,
@@ -8,10 +11,10 @@ CREATE TABLE kanji(
 );
 
 -- Insert characters not listed in kanjidic2
-INSERT INTO kanji (id, stroke) VALUES('｜', 1),('ノ', 1),('ハ', 2),('マ', 2),('ユ', 2),('ヨ', 3);
+INSERT INTO character (id, stroke) VALUES('｜', 1),('ノ', 1),('ハ', 2),('マ', 2),('ユ', 2),('ヨ', 3);
 
 CREATE VIEW radical AS
-SELECT id, stroke FROM kanji WHERE id IN (
+SELECT id, stroke FROM character WHERE id IN (
 '一','｜','丶','ノ','乙','亅','二','亠','人','化','个','儿','入','ハ','并','冂','冖','冫','几','凵',
 '刀','刈','力','勹','匕','匚','十','卜','卩','厂','厶','又','マ','九','ユ','乃','込','口','囗','土',
 '士','夂','夕','大','女','子','宀','寸','小','尚','尢','尸','屮','山','川','巛','工','已','巾','干',
@@ -26,35 +29,35 @@ SELECT id, stroke FROM kanji WHERE id IN (
 '香','品','馬','骨','高','髟','鬥','鬯','鬲','鬼','竜','韋','魚','鳥','鹵','鹿','麻','亀','滴','黄',
 '黒','黍','黹','無','歯','黽','鼎','鼓','鼠','鼻','齊','龠');
 
-CREATE TABLE kanji_radical(
-    id_kanji STRING,
+CREATE TABLE character_radical(
+    id_character STRING,
     id_radical STRING,
-    FOREIGN KEY(id_kanji) REFERENCES kanji(id),
+    FOREIGN KEY(id_character) REFERENCES character(id),
     FOREIGN KEY(id_radical) REFERENCES radical(id),
-    PRIMARY KEY (id_kanji, id_radical)
+    PRIMARY KEY (id_character, id_radical)
 );
 
 CREATE TABLE on_yomi(
     id INTEGER PRIMARY KEY,
-    id_kanji STRING,
+    id_character STRING,
     reading STRING,
-    FOREIGN KEY(id_kanji) REFERENCES kanji(id)
+    FOREIGN KEY(id_character) REFERENCES character(id)
 );
 
 CREATE INDEX idx_on_yomi_reading ON on_yomi(reading);
 
 CREATE TABLE kun_yomi(
     id INTEGER PRIMARY KEY,
-    id_kanji STRING,
+    id_character STRING,
     reading STRING,
-    FOREIGN KEY(id_kanji) REFERENCES kanji(id)
+    FOREIGN KEY(id_character) REFERENCES character(id)
 );
 
 CREATE INDEX idx_kun_yomi_reading ON kun_yomi(reading);
 
 CREATE table meaning(
     id INTEGER PRIMARY KEY,
-    id_kanji INTEGER,
+    id_character INTEGER,
     meaning STRING,
     lang STRING
 );
