@@ -59,24 +59,12 @@ void main(List<String> args) async {
         String lang;
 
         if (attributesLang.isEmpty) {
-          lang = "eng";
+          lang = "en";
         } else {
-          switch (attributesLang.first.value) {
-            case 'fr':
-              lang = 'fre';
-              break;
-            case 'es':
-              lang = 'spa';
-              break;
-            case 'pt':
-              lang = 'por';
-              break;
-            default:
-              lang = attributesLang.first.value;
-          }
+          lang = attributesLang.first.value;
         }
 
-        if (langs.isEmpty || langs.contains(lang)) {
+        if (langs.contains(lang)) {
           meanings.add(Meaning(meaning: escape(meaning.text), lang: lang));
         }
       }
@@ -106,6 +94,9 @@ void main(List<String> args) async {
     }
 
     final buffer = StringBuffer();
+
+    writeInsertToBuffer(
+        buffer, "lang", langs.asMap().entries.map((e) => [e.key + 1, "'${e.value}'"]));
 
     //Generate the SQL from the List of Kanji
     for (var kanji in kanjis) {
@@ -142,8 +133,8 @@ void main(List<String> args) async {
           values.add([
             "NULL",
             "'${kanji.character}'",
+            "'${langs.indexOf(meaning.lang) + 1}'",
             "'${escape(meaning.meaning)}'",
-            "'${meaning.lang}'"
           ]);
         }
         writeInsertToBuffer(buffer, "meaning", values);

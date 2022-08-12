@@ -11,7 +11,7 @@ CREATE TABLE character(
 );
 
 -- Insert characters not listed in kanjidic2
-INSERT INTO character (id, stroke) VALUES('｜', 1),('ノ', 1),('ハ', 2),('マ', 2),('ユ', 2),('ヨ', 3);
+INSERT INTO character (id, stroke_count) VALUES('｜', 1),('ノ', 1),('ハ', 2),('マ', 2),('ユ', 2),('ヨ', 3);
 
 CREATE VIEW radical AS
 SELECT id, stroke FROM character WHERE id IN (
@@ -58,8 +58,9 @@ CREATE INDEX idx_kun_yomi_reading ON kun_yomi(reading);
 CREATE table meaning(
     id INTEGER PRIMARY KEY,
     id_character INTEGER,
-    meaning STRING,
-    lang STRING
+    id_lang INTEGER,
+    content STRING,
+    FOREIGN KEY(id_lang) REFERENCES lang(id)
 );
 
-CREATE INDEX idx_reading ON meaning(meaning);
+CREATE INDEX idx_meaning ON meaning(content);
