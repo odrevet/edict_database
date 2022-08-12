@@ -47,11 +47,15 @@ Example: Reset previously generated expression database, generate sql for englis
 bash src/run.bash expression --clean --init --sql "eng" --populate
 ```
 
+```
+bash src/run.bash kanji --clean --init --sql "en" --populate
+```
+
 # Generate sql for selected languages
 
 The `src/expression/create_sql.dart` script can be called with arguments to process only some languages.
 
-The languages are in ISO 639-3 format, for example: 
+The languages are in ISO 639-3 format for expression and ISO 639-2 for kanji, for example: 
 
 English and French
 
@@ -65,10 +69,8 @@ English only
 dart src/expression/create_sql.dart eng
 ```
 
-All languages
-
 ```
-dart src/expression/create_sql.dart
+dart src/kanji/create_sql.dart en
 ```
 
 note: `run.bash`  allow to pass language arguments with quotes, for example: 
