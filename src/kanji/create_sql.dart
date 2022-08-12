@@ -100,44 +100,35 @@ void main(List<String> args) async {
 
     //Generate the SQL from the List of Kanji
     for (var kanji in kanjis) {
-      buffer.write(
-          "INSERT INTO character VALUES ('${kanji.character}', ${kanji.stroke}, ${kanji.freq}, ${kanji.jlpt});\n");
+      writeInsertToBuffer(buffer, "character", [
+        ["'${kanji.character}'", kanji.stroke, kanji.freq, kanji.jlpt]
+      ]);
 
       if (kanji.radicals.isNotEmpty) {
-        List<List<dynamic>> values = [];
-        for (var radical in kanji.radicals) {
-          values.add(["'${kanji.character}'", "'$radical'"]);
-        }
-        writeInsertToBuffer(buffer, "character_radical", values);
+        writeInsertToBuffer(buffer, "character_radical",
+            kanji.radicals.map((radical) => ["'${kanji.character}'", "'$radical'"]));
       }
 
       if (kanji.on.isNotEmpty) {
-        List<List<dynamic>> values = [];
-        for (var on in kanji.on) {
-          values.add(["NULL", "'${kanji.character}'", "'$on'"]);
-        }
-        writeInsertToBuffer(buffer, "on_yomi", values);
+        writeInsertToBuffer(
+            buffer, "on_yomi", kanji.on.map((on) => ["NULL", "'${kanji.character}'", "'$on'"]));
       }
 
       if (kanji.kun.isNotEmpty) {
-        List<List<dynamic>> values = [];
-        for (var kun in kanji.kun) {
-          values.add(["NULL", "'${kanji.character}'", "'$kun'"]);
-        }
-        writeInsertToBuffer(buffer, "kun_yomi", values);
+        writeInsertToBuffer(
+            buffer, "kun_yomi", kanji.kun.map((kun) => ["NULL", "'${kanji.character}'", "'$kun'"]));
       }
 
       if (kanji.meanings.isNotEmpty) {
-        List<List<dynamic>> values = [];
-        for (var meaning in kanji.meanings) {
-          values.add([
-            "NULL",
-            "'${kanji.character}'",
-            "'${langs.indexOf(meaning.lang) + 1}'",
-            "'${escape(meaning.meaning)}'",
-          ]);
-        }
-        writeInsertToBuffer(buffer, "meaning", values);
+        writeInsertToBuffer(
+            buffer,
+            "meaning",
+            kanji.meanings.map((meaning) => [
+                  "NULL",
+                  "'${kanji.character}'",
+                  "'${langs.indexOf(meaning.lang) + 1}'",
+                  "'${escape(meaning.meaning)}'",
+                ]));
       }
     }
 
