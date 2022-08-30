@@ -21,8 +21,7 @@ void writeEntityToBuffer(StringBuffer buffer, Map<String, List<Entity>> entities
         entities[key]!.map((e) => [e.id, "'${e.name}'", "'${escape(e.description)}'"]),
         ["id", "name", "description"]);
 
-/// write sense relation table (e.g sense_misc, sense_pos, sense_dial)
-void writeRelationToBuffer(StringBuffer buffer, Map<String, List<Entity>> entities, String key,
+void writeEntityRelationToBuffer(StringBuffer buffer, Map<String, List<Entity>> entities, String key,
         int id, Iterable<String> entitiesToWrite, String tableName) =>
     writeInsertToBuffer(buffer, tableName, entitiesToWrite.map((entity) {
       String entryEntityStr = entity.trim();
@@ -30,6 +29,7 @@ void writeRelationToBuffer(StringBuffer buffer, Map<String, List<Entity>> entiti
       return [id, entities[key]!.firstWhere((element) => element.name == entryEntityStr).id];
     }));
 
+/// write sense relation table (e.g sense_misc, sense_pos, sense_dial)
 Iterable<String>? writeSenseRelationToBuffer(
     StringBuffer buffer,
     Map<String, List<Entity>> entities,
@@ -40,7 +40,7 @@ Iterable<String>? writeSenseRelationToBuffer(
   var posesSensesTmp = senseElement.findAllElements(key);
   senseEntities = posesSensesTmp.isEmpty ? senseEntities : posesSensesTmp.map((e) => e.text);
   if (senseEntities != null && senseEntities.isNotEmpty) {
-    writeRelationToBuffer(buffer, entities, key, senseId, senseEntities, "sense_$key");
+    writeEntityRelationToBuffer(buffer, entities, key, senseId, senseEntities, "sense_$key");
   }
   return senseEntities;
 }
@@ -90,7 +90,7 @@ List<int> writeElementToBuffer(StringBuffer buffer, int idElement, int entSeq, i
       info.add(element.innerText);
     });
     if (info.isNotEmpty) {
-      writeRelationToBuffer(
+      writeEntityRelationToBuffer(
           buffer, entities, "${type}e_inf", idElement, info, "${tableName}_${type}e_inf");
     }
 
