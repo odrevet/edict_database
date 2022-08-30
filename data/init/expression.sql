@@ -18,14 +18,20 @@ CREATE TABLE r_ele(
 
 CREATE INDEX idx_reb ON r_ele(reb);
 
+CREATE TABLE r_ele_k_ele(
+    id_r_ele INTEGER,
+    id_k_ele INTEGER,
+    FOREIGN KEY(id_r_ele) REFERENCES r_ele(id),
+    FOREIGN KEY(id_k_ele) REFERENCES k_ele(id),
+    PRIMARY KEY (id_r_ele, id_k_ele)
+);
+
 CREATE TABLE k_ele(
     id INTEGER PRIMARY KEY,
     id_entry INTEGER,
-    id_r_ele INTEGER,
     id_pri INTEGER,
     keb STRING,
     FOREIGN KEY(id_entry) REFERENCES entry(id),
-    FOREIGN KEY(id_r_ele) REFERENCES r_ele(id),
     FOREIGN KEY(id_pri) REFERENCES pri(id)
 );
 

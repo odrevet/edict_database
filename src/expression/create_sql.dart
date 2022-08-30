@@ -21,8 +21,8 @@ void writeEntityToBuffer(StringBuffer buffer, Map<String, List<Entity>> entities
         entities[key]!.map((e) => [e.id, "'${e.name}'", "'${escape(e.description)}'"]),
         ["id", "name", "description"]);
 
-void writeEntityRelationToBuffer(StringBuffer buffer, Map<String, List<Entity>> entities, String key,
-        int id, Iterable<String> entitiesToWrite, String tableName) =>
+void writeEntityRelationToBuffer(StringBuffer buffer, Map<String, List<Entity>> entities,
+        String key, int id, Iterable<String> entitiesToWrite, String tableName) =>
     writeInsertToBuffer(buffer, tableName, entitiesToWrite.map((entity) {
       String entryEntityStr = entity.trim();
       entryEntityStr = entryEntityStr.substring(1, entryEntityStr.length - 1); //remove & and ;
@@ -60,18 +60,18 @@ Map<String, String> parsePriorityElement(XmlElement parent, String tagName) {
   return priority;
 }
 
-Map<String, String> bindElementReRestr(XmlElement entry) {
-  Map<String, String> reRestrHash = {};
+Map<String, List<String>?> bindElementReRestr(XmlElement entry) {
+  Map<String, List<String>?> reRestrHash = {};
 
   for (var element in entry.findAllElements('r_ele')) {
     String reb = element.findElements('reb').first.text;
     var reRestrElements = element.findAllElements('re_restr');
     if (reRestrElements.isEmpty) {
-      // when re_restr is empty, apply reb to all keb without reb
-      reRestrHash[''] = reb;
+      reRestrHash[reb] = null;
     } else {
+      reRestrHash[reb] = [];
       for (var reRestrElement in reRestrElements) {
-        reRestrHash[reRestrElement.text] = reb;
+        reRestrHash[reb]!.add(reRestrElement.text);
       }
     }
   }
@@ -79,8 +79,8 @@ Map<String, String> bindElementReRestr(XmlElement entry) {
   return reRestrHash;
 }
 
-List<int> writeElementToBuffer(StringBuffer buffer, int idElement, int entSeq, int idPriority,
-    XmlElement entry, Map<String, List<Entity>> entities, String type) {
+List<dynamic> writeElementToBuffer(StringBuffer buffer, int idElement, int entSeq, int idPriority,
+    XmlElement entry, Map<String, List<Entity>> entities, String type, List<List<dynamic>>? kEle) {
   List<List<dynamic>> values = [];
   String tableName = '${type}_ele';
   for (var element in entry.findAllElements('${type}_ele')) {
@@ -124,42 +124,35 @@ List<int> writeElementToBuffer(StringBuffer buffer, int idElement, int entSeq, i
   }
 
   if (values.isNotEmpty) {
-    // set id_r_ele when processing k_ele
-    if (type == "k") {
-      // init id_r_ele to null
-      for (var value in values) {
-        value.insert(2, 'NULL');
-      }
+    writeInsertToBuffer(buffer, tableName, values);
 
+    if (type == "r") {
       var reRestrHash = bindElementReRestr(entry);
-
-      reRestrHash.forEach((reRestrKey, reRestrValue) {
-        if (reRestrKey != '') {
-          for (var value in values) {
-            // compare keb with reRestr text
-            if (value[4] == "'$reRestrKey'") {
-              value[2] =
-                  "(SELECT id from r_ele WHERE id_entry = $entSeq AND reb = '$reRestrValue')";
-            }
+      reRestrHash.forEach((reRestrReb, reRestrKebList) {
+        if (reRestrKebList == null && kEle != null) {
+          for(var k in kEle){
+            writeInsertToBuffer(buffer, "r_ele_k_ele", [
+              [
+                "(SELECT id from r_ele WHERE id_entry = $entSeq AND reb = '$reRestrReb')",
+                k[0]
+              ]
+            ]);
+          }
+        } else {
+          for (var reRestrKeb in reRestrKebList!) {
+            writeInsertToBuffer(buffer, "r_ele_k_ele", [
+              [
+                "(SELECT id from r_ele WHERE id_entry = $entSeq AND reb = '$reRestrReb')",
+                "(SELECT id from k_ele WHERE id_entry = $entSeq AND keb = '$reRestrKeb')"
+              ]
+            ]);
           }
         }
       });
-
-      if (reRestrHash.containsKey('')) {
-        for (var value in values) {
-          // update all keb with null reRestr
-          if (value[2] == 'NULL') {
-            value[2] =
-                "(SELECT id from r_ele WHERE id_entry = $entSeq AND reb = '${reRestrHash['']}')";
-          }
-        }
-      }
     }
-
-    writeInsertToBuffer(buffer, tableName, values);
   }
 
-  return [idElement, idPriority];
+  return [idElement, idPriority, values];
 }
 
 void main(List<String> args) {
@@ -228,16 +221,16 @@ void main(List<String> args) {
       int entSeq = int.parse(entry.findAllElements('ent_seq').first.text);
       buffer.write('INSERT INTO entry values ($entSeq);\n');
 
-      List<int> ids = [];
-
-      // Reading Elements
-      ids = writeElementToBuffer(buffer, idReading, entSeq, idPriority, entry, entities, "r");
-      idReading = ids[0];
-      idPriority = ids[1];
+      List<dynamic> ids = [];
 
       // Kanji Elements
-      ids = writeElementToBuffer(buffer, idKanji, entSeq, idPriority, entry, entities, "k");
+      ids = writeElementToBuffer(buffer, idKanji, entSeq, idPriority, entry, entities, "k", null);
       idKanji = ids[0];
+      idPriority = ids[1];
+
+      // Reading Elements
+      ids = writeElementToBuffer(buffer, idReading, entSeq, idPriority, entry, entities, "r", ids[2]);
+      idReading = ids[0];
       idPriority = ids[1];
 
       // Senses
