@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:xml/xml.dart';
 
-import '../common.dart';
+import 'common.dart';
 
 class Entity {
   int id;

@@ -53,7 +53,7 @@ bash src/run.bash kanji --clean --init --sql "en" --populate
 
 # Generate sql for selected languages
 
-The `src/expression/create_sql.dart` script can be called with arguments to process only some languages.
+The `src/create_sql_expression.dart` and `src/create_sql_kanji.dart` scripts can be called with arguments to process only some languages.
 
 The languages are in ISO 639-3 format for expression and ISO 639-2 for kanji, for example: 
 

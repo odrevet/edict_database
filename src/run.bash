@@ -36,7 +36,7 @@ while true; do
       shift
     fi
 
-    dart "src/${subject}/create_sql.dart" $languages
+    dart "src/create_sql_${subject}.dart" $languages
 
     ;;
   --init)
