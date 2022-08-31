@@ -65,9 +65,11 @@ Map<String, List<String>?> bindElementReRestr(XmlElement entry) {
 
   for (var element in entry.findAllElements('r_ele')) {
     String reb = element.findElements('reb').first.text;
-    var reRestrElements = element.findAllElements('re_restr');
+    var reRestrElements = element.findElements('re_restr');
     if (reRestrElements.isEmpty) {
-      reRestrHash[reb] = null;
+      if (element.findElements('re_nokanji').isEmpty) {
+        reRestrHash[reb] = null;
+      }
     } else {
       reRestrHash[reb] = [];
       for (var reRestrElement in reRestrElements) {
@@ -130,12 +132,9 @@ List<dynamic> writeElementToBuffer(StringBuffer buffer, int idElement, int entSe
       var reRestrHash = bindElementReRestr(entry);
       reRestrHash.forEach((reRestrReb, reRestrKebList) {
         if (reRestrKebList == null && kEle != null) {
-          for(var k in kEle){
+          for (var k in kEle) {
             writeInsertToBuffer(buffer, "r_ele_k_ele", [
-              [
-                "(SELECT id from r_ele WHERE id_entry = $entSeq AND reb = '$reRestrReb')",
-                k[0]
-              ]
+              ["(SELECT id from r_ele WHERE id_entry = $entSeq AND reb = '$reRestrReb')", k[0]]
             ]);
           }
         } else {
@@ -229,7 +228,8 @@ void main(List<String> args) {
       idPriority = ids[1];
 
       // Reading Elements
-      ids = writeElementToBuffer(buffer, idReading, entSeq, idPriority, entry, entities, "r", ids[2]);
+      ids =
+          writeElementToBuffer(buffer, idReading, entSeq, idPriority, entry, entities, "r", ids[2]);
       idReading = ids[0];
       idPriority = ids[1];
 
