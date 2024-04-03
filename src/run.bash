@@ -69,7 +69,7 @@ while true; do
     shift
     ;;
   --download)
-    if [ "$subject" = "expression"]; then
+    if [ "$subject" = "expression" ]; then
       wget ftp://ftp.edrdg.org/pub/Nihongo//JMdict.gz --directory-prefix=data
       gunzip data/JMdict.gz
     else
