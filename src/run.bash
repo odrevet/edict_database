@@ -73,7 +73,7 @@ while true; do
       wget ftp://ftp.edrdg.org/pub/Nihongo//JMdict.gz --directory-prefix=data
       gunzip data/JMdict.gz
     else
-      wget http://nihongo.monash.edu/kanjidic2/kanjidic2.xml.gz --directory-prefix=data
+      wget http://www.edrdg.org/kanjidic/kanjidic2.xml.gz --directory-prefix=data
       gunzip data/kanjidic2.xml.gz
     fi
     shift
