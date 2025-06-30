@@ -12,7 +12,7 @@ SQL is generated using scripts written in `dart`;
 
 Download required packages with
 
-	`pub get`
+`dart pub get`
 
 ## Utils required binaries
 
@@ -60,17 +60,17 @@ The languages are in ISO 639-3 format for expression and ISO 639-2 for kanji, fo
 English and French
 
 ```
-dart src/expression/create_sql.dart eng fre
+dart src/create_sql_expression.dart eng fre
 ```
 
 English only
 
 ```
-dart src/expression/create_sql.dart eng
+dart src/create_sql_expression.dart eng
 ```
 
 ```
-dart src/kanji/create_sql.dart en
+dart src/create_sql_kanji.dart en
 ```
 
 note: `run.bash`  allow to pass language arguments with quotes, for example: 
