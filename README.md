@@ -29,7 +29,7 @@ sudo apt install sqlite3
 
 # run.bash
 
-Bash scripts src/run.bash can be called with arguments
+Bash scripts `src/run.bash` can be called with arguments
 
     bash run.bash <kanji|expression|help> [arguments]
     arguments:
