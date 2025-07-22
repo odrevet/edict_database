@@ -23,7 +23,7 @@ Download required packages with
 
 sqlite3 db files are created and populated using the `sqlite3` binary.
 
-```
+```bash
 sudo apt install sqlite3
 ```
 
@@ -43,11 +43,11 @@ Bash scripts `src/run.bash` can be called with arguments
 
 Example: Reset previously generated expression database, generate sql for english sense and populate the db: 
 
-```
+```bash
 bash src/run.bash expression --clean --init --sql "eng" --populate
 ```
 
-```
+```bash
 bash src/run.bash kanji --clean --init --sql "en" --populate
 ```
 
@@ -59,13 +59,13 @@ The languages are in ISO 639-3 format for expression and ISO 639-2 for kanji, fo
 
 English and French
 
-```
+```bash
 dart src/create_sql_expression.dart eng fre
 ```
 
 English only
 
-```
+```bash
 dart src/create_sql_expression.dart eng
 ```
 
@@ -75,8 +75,22 @@ dart src/create_sql_kanji.dart en
 
 note: `run.bash`  allow to pass language arguments with quotes, for example: 
 
-```
+```bash
 bash src/run.bash expression --sql "eng fre"
+```
+
+# generated files
+
+Files are generated under `data/generated` directory
+
+Databases can be opened/tested with `sqlite3` binary
+
+```bash
+sqlite3 data/generated/db/expression.db
+```
+
+```bash
+sqlite3 data/generated/db/kanji.db
 ```
 
 # Documentation
