@@ -66,7 +66,7 @@ void main(List<String> args) async {
     var characters = document.findAllElements('character');
 
     for (var character in characters) {
-      String literal = character.findAllElements('literal').first.text;
+      String literal = character.findAllElements('literal').first.innerText;
 
       //READINGS
       var on = <String>[];
@@ -77,10 +77,10 @@ void main(List<String> args) async {
         for (var attribute in attributes) {
           switch (attribute.value) {
             case 'ja_on':
-              on.add(reading.text);
+              on.add(reading.innerText);
               break;
             case 'ja_kun':
-              kun.add(reading.text);
+              kun.add(reading.innerText);
               break;
           }
         }
@@ -110,26 +110,26 @@ void main(List<String> args) async {
         }
 
         if (langs.contains(lang)) {
-          meanings.add(Meaning(meaning: escape(meaning.text), lang: lang));
+          meanings.add(Meaning(meaning: escape(meaning.innerText), lang: lang));
         }
       }
 
       String freq = "NULL";
       var freqElement = character.findAllElements('freq');
       if (freqElement.isNotEmpty) {
-        freq = freqElement.first.text;
+        freq = freqElement.first.innerText;
       }
 
       String jlpt = "NULL";
       var jlptElement = character.findAllElements('jlpt');
       if (jlptElement.isNotEmpty) {
-        jlpt = jlptElement.first.text;
+        jlpt = jlptElement.first.innerText;
       }
 
       //Add kanji to list
       kanjis.add(Kanji(
           character: literal,
-          stroke: int.parse(character.findAllElements('stroke_count').first.text),
+          stroke: int.parse(character.findAllElements('stroke_count').first.innerText),
           radicals: radicals,
           on: on,
           kun: kun,

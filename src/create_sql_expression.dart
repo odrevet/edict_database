@@ -38,7 +38,7 @@ Iterable<String>? writeSenseRelationToBuffer(
     int senseId,
     Iterable<String>? senseEntities) {
   var posesSensesTmp = senseElement.findAllElements(key);
-  senseEntities = posesSensesTmp.isEmpty ? senseEntities : posesSensesTmp.map((e) => e.text);
+  senseEntities = posesSensesTmp.isEmpty ? senseEntities : posesSensesTmp.map((e) => e.innerText);
   if (senseEntities != null && senseEntities.isNotEmpty) {
     writeEntityRelationToBuffer(buffer, entities, key, senseId, senseEntities, "sense_$key");
   }
@@ -64,7 +64,7 @@ Map<String, List<String>?> bindElementReRestr(XmlElement entry) {
   Map<String, List<String>?> reRestrHash = {};
 
   for (var element in entry.findAllElements('r_ele')) {
-    String reb = element.findElements('reb').first.text;
+    String reb = element.findElements('reb').first.innerText;
     var reRestrElements = element.findElements('re_restr');
     if (reRestrElements.isEmpty) {
       if (element.findElements('re_nokanji').isEmpty) {
@@ -73,7 +73,7 @@ Map<String, List<String>?> bindElementReRestr(XmlElement entry) {
     } else {
       reRestrHash[reb] = [];
       for (var reRestrElement in reRestrElements) {
-        reRestrHash[reb]!.add(reRestrElement.text);
+        reRestrHash[reb]!.add(reRestrElement.innerText);
       }
     }
   }
@@ -119,7 +119,7 @@ List<dynamic> writeElementToBuffer(StringBuffer buffer, int idElement, int entSe
       idElement,
       entSeq,
       insertedIdPriority,
-      "'${element.findElements("${type}eb").first.text}'"
+      "'${element.findElements("${type}eb").first.innerText}'"
     ]);
 
     idElement++;
@@ -217,7 +217,7 @@ void main(List<String> args) {
 
     // Entries
     for (var entry in entries) {
-      int entSeq = int.parse(entry.findAllElements('ent_seq').first.text);
+      int entSeq = int.parse(entry.findAllElements('ent_seq').first.innerText);
       buffer.write('INSERT INTO entry values ($entSeq);\n');
 
       List<dynamic> ids = [];
@@ -275,7 +275,7 @@ void main(List<String> args) {
 
           List<List<dynamic>> glossValues = [];
           for (var gloss in glosses) {
-            glossValues.add([idSense, langs.indexOf(lang) + 1, "'${escape(gloss.text)}'"]);
+            glossValues.add([idSense, langs.indexOf(lang) + 1, "'${escape(gloss.innerText)}'"]);
           }
 
           if (glossValues.isNotEmpty) {
