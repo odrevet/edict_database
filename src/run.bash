@@ -47,7 +47,7 @@ while true; do
       sqlite3 $db_path <$sql_init_path
       echo "created ${db_path} from ${sql_init_path}"
     else
-      echo "${db_path} alderly exists."
+      echo "${db_path} already exists."
     fi
     shift
     ;;
