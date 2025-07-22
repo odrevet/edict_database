@@ -11,22 +11,39 @@ class Entity {
   String name;
   String description;
 
-  Entity({required this.id, required this.type, required this.name, required this.description});
+  Entity(
+      {required this.id,
+      required this.type,
+      required this.name,
+      required this.description});
 }
 
-void writeEntityToBuffer(StringBuffer buffer, Map<String, List<Entity>> entities, String key) =>
+void writeEntityToBuffer(
+        StringBuffer buffer, Map<String, List<Entity>> entities, String key) =>
     writeInsertToBuffer(
         buffer,
         key,
-        entities[key]!.map((e) => [e.id, "'${e.name}'", "'${escape(e.description)}'"]),
+        entities[key]!
+            .map((e) => [e.id, "'${e.name}'", "'${escape(e.description)}'"]),
         ["id", "name", "description"]);
 
-void writeEntityRelationToBuffer(StringBuffer buffer, Map<String, List<Entity>> entities,
-        String key, int id, Iterable<String> entitiesToWrite, String tableName) =>
+void writeEntityRelationToBuffer(
+        StringBuffer buffer,
+        Map<String, List<Entity>> entities,
+        String key,
+        int id,
+        Iterable<String> entitiesToWrite,
+        String tableName) =>
     writeInsertToBuffer(buffer, tableName, entitiesToWrite.map((entity) {
       String entryEntityStr = entity.trim();
-      entryEntityStr = entryEntityStr.substring(1, entryEntityStr.length - 1); //remove & and ;
-      return [id, entities[key]!.firstWhere((element) => element.name == entryEntityStr).id];
+      entryEntityStr = entryEntityStr.substring(
+          1, entryEntityStr.length - 1); //remove & and ;
+      return [
+        id,
+        entities[key]!
+            .firstWhere((element) => element.name == entryEntityStr)
+            .id
+      ];
     }));
 
 /// write sense relation table (e.g sense_misc, sense_pos, sense_dial)
@@ -38,9 +55,12 @@ Iterable<String>? writeSenseRelationToBuffer(
     int senseId,
     Iterable<String>? senseEntities) {
   var posesSensesTmp = senseElement.findAllElements(key);
-  senseEntities = posesSensesTmp.isEmpty ? senseEntities : posesSensesTmp.map((e) => e.innerText);
+  senseEntities = posesSensesTmp.isEmpty
+      ? senseEntities
+      : posesSensesTmp.map((e) => e.innerText);
   if (senseEntities != null && senseEntities.isNotEmpty) {
-    writeEntityRelationToBuffer(buffer, entities, key, senseId, senseEntities, "sense_$key");
+    writeEntityRelationToBuffer(
+        buffer, entities, key, senseId, senseEntities, "sense_$key");
   }
   return senseEntities;
 }
@@ -81,8 +101,15 @@ Map<String, List<String>?> bindElementReRestr(XmlElement entry) {
   return reRestrHash;
 }
 
-List<dynamic> writeElementToBuffer(StringBuffer buffer, int idElement, int entSeq, int idPriority,
-    XmlElement entry, Map<String, List<Entity>> entities, String type, List<List<dynamic>>? kEle) {
+List<dynamic> writeElementToBuffer(
+    StringBuffer buffer,
+    int idElement,
+    int entSeq,
+    int idPriority,
+    XmlElement entry,
+    Map<String, List<Entity>> entities,
+    String type,
+    List<List<dynamic>>? kEle) {
   List<List<dynamic>> values = [];
   String tableName = '${type}_ele';
   for (var element in entry.findAllElements('${type}_ele')) {
@@ -92,12 +119,13 @@ List<dynamic> writeElementToBuffer(StringBuffer buffer, int idElement, int entSe
       info.add(element.innerText);
     });
     if (info.isNotEmpty) {
-      writeEntityRelationToBuffer(
-          buffer, entities, "${type}e_inf", idElement, info, "${tableName}_${type}e_inf");
+      writeEntityRelationToBuffer(buffer, entities, "${type}e_inf", idElement,
+          info, "${tableName}_${type}e_inf");
     }
 
     // priority
-    Map<String, String> priority = parsePriorityElement(element, '${type}e_pri');
+    Map<String, String> priority =
+        parsePriorityElement(element, '${type}e_pri');
     String insertedIdPriority = "NULL";
     if (priority.isNotEmpty) {
       writeInsertToBuffer(buffer, "pri", [
@@ -134,7 +162,10 @@ List<dynamic> writeElementToBuffer(StringBuffer buffer, int idElement, int entSe
         if (reRestrKebList == null && kEle != null) {
           for (var k in kEle) {
             writeInsertToBuffer(buffer, "r_ele_k_ele", [
-              ["(SELECT id from r_ele WHERE id_entry = $entSeq AND reb = '$reRestrReb')", k[0]]
+              [
+                "(SELECT id from r_ele WHERE id_entry = $entSeq AND reb = '$reRestrReb')",
+                k[0]
+              ]
             ]);
           }
         } else {
@@ -161,8 +192,8 @@ void main(List<String> args) {
   File('data/JMdict').readAsString().then((String contents) {
     final buffer = StringBuffer();
 
-    writeInsertToBuffer(
-        buffer, "lang", langs.asMap().entries.map((e) => [e.key + 1, "'${e.value}'"]));
+    writeInsertToBuffer(buffer, "lang",
+        langs.asMap().entries.map((e) => [e.key + 1, "'${e.value}'"]));
 
     print("parsing...");
     var document = XmlDocument.parse(contents);
@@ -195,7 +226,8 @@ void main(List<String> args) {
         if (exp.hasMatch(element)) {
           Iterable<RegExpMatch> matches = exp.allMatches(element);
           for (final m in matches) {
-            entities[key]!.add(Entity(id: index, type: key, name: m[1]!, description: m[2]!));
+            entities[key]!.add(
+                Entity(id: index, type: key, name: m[1]!, description: m[2]!));
           }
           index++;
         }
@@ -223,13 +255,14 @@ void main(List<String> args) {
       List<dynamic> ids = [];
 
       // Kanji Elements
-      ids = writeElementToBuffer(buffer, idKanji, entSeq, idPriority, entry, entities, "k", null);
+      ids = writeElementToBuffer(
+          buffer, idKanji, entSeq, idPriority, entry, entities, "k", null);
       idKanji = ids[0];
       idPriority = ids[1];
 
       // Reading Elements
-      ids =
-          writeElementToBuffer(buffer, idReading, entSeq, idPriority, entry, entities, "r", ids[2]);
+      ids = writeElementToBuffer(
+          buffer, idReading, entSeq, idPriority, entry, entities, "r", ids[2]);
       idReading = ids[0];
       idPriority = ids[1];
 
@@ -252,8 +285,8 @@ void main(List<String> args) {
 
         // check lang attribute of the first gloss
         // assume every gloss in this sense has the same lang
-        var langAttr =
-            glosses.first.attributes.where((attribute) => attribute.name.toString() == 'xml:lang');
+        var langAttr = glosses.first.attributes
+            .where((attribute) => attribute.name.toString() == 'xml:lang');
         if (langAttr.isEmpty) {
           lang = 'eng';
         } else {
@@ -268,18 +301,27 @@ void main(List<String> args) {
             "id_entry",
           ]);
 
-          poses = writeSenseRelationToBuffer(buffer, entities, "pos", sense, idSense, poses);
-          misc = writeSenseRelationToBuffer(buffer, entities, "misc", sense, idSense, misc);
-          dial = writeSenseRelationToBuffer(buffer, entities, "dial", sense, idSense, dial);
-          field = writeSenseRelationToBuffer(buffer, entities, "field", sense, idSense, field);
+          poses = writeSenseRelationToBuffer(
+              buffer, entities, "pos", sense, idSense, poses);
+          misc = writeSenseRelationToBuffer(
+              buffer, entities, "misc", sense, idSense, misc);
+          dial = writeSenseRelationToBuffer(
+              buffer, entities, "dial", sense, idSense, dial);
+          field = writeSenseRelationToBuffer(
+              buffer, entities, "field", sense, idSense, field);
 
           List<List<dynamic>> glossValues = [];
           for (var gloss in glosses) {
-            glossValues.add([idSense, langs.indexOf(lang) + 1, "'${escape(gloss.innerText)}'"]);
+            glossValues.add([
+              idSense,
+              langs.indexOf(lang) + 1,
+              "'${escape(gloss.innerText)}'"
+            ]);
           }
 
           if (glossValues.isNotEmpty) {
-            writeInsertToBuffer(buffer, "gloss", glossValues, ["id_sense", "id_lang", "content"]);
+            writeInsertToBuffer(buffer, "gloss", glossValues,
+                ["id_sense", "id_lang", "content"]);
           }
 
           idSense++;

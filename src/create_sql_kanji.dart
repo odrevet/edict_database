@@ -24,13 +24,13 @@ class Kanji {
 
   Kanji(
       {required this.character,
-        required this.stroke,
-        this.radicals = const [],
-        this.on = const [],
-        this.kun = const [],
-        this.meanings = const [],
-        required this.freq,
-        required this.jlpt});
+      required this.stroke,
+      this.radicals = const [],
+      this.on = const [],
+      this.kun = const [],
+      this.meanings = const [],
+      required this.freq,
+      required this.jlpt});
 
   factory Kanji.fromMap(Map<String, dynamic> map) {
     return Kanji(
@@ -100,7 +100,8 @@ void main(List<String> args) async {
       var meaningsDom = character.findAllElements('meaning');
       for (var meaning in meaningsDom) {
         var attributes = meaning.attributes;
-        var attributesLang = attributes.where((attribute) => attribute.name.toString() == 'm_lang');
+        var attributesLang = attributes
+            .where((attribute) => attribute.name.toString() == 'm_lang');
         String lang;
 
         if (attributesLang.isEmpty) {
@@ -129,7 +130,8 @@ void main(List<String> args) async {
       //Add kanji to list
       kanjis.add(Kanji(
           character: literal,
-          stroke: int.parse(character.findAllElements('stroke_count').first.innerText),
+          stroke: int.parse(
+              character.findAllElements('stroke_count').first.innerText),
           radicals: radicals,
           on: on,
           kun: kun,
@@ -140,8 +142,8 @@ void main(List<String> args) async {
 
     final buffer = StringBuffer();
 
-    writeInsertToBuffer(
-        buffer, "lang", langs.asMap().entries.map((e) => [e.key + 1, "'${e.value}'"]));
+    writeInsertToBuffer(buffer, "lang",
+        langs.asMap().entries.map((e) => [e.key + 1, "'${e.value}'"]));
 
     //Generate the SQL from the List of Kanji
     for (var kanji in kanjis) {
@@ -150,18 +152,21 @@ void main(List<String> args) async {
       ]);
 
       if (kanji.radicals.isNotEmpty) {
-        writeInsertToBuffer(buffer, "character_radical",
-            kanji.radicals.map((radical) => ["'${kanji.character}'", "'$radical'"]));
+        writeInsertToBuffer(
+            buffer,
+            "character_radical",
+            kanji.radicals
+                .map((radical) => ["'${kanji.character}'", "'$radical'"]));
       }
 
       if (kanji.on.isNotEmpty) {
-        writeInsertToBuffer(
-            buffer, "on_yomi", kanji.on.map((on) => ["NULL", "'${kanji.character}'", "'$on'"]));
+        writeInsertToBuffer(buffer, "on_yomi",
+            kanji.on.map((on) => ["NULL", "'${kanji.character}'", "'$on'"]));
       }
 
       if (kanji.kun.isNotEmpty) {
-        writeInsertToBuffer(
-            buffer, "kun_yomi", kanji.kun.map((kun) => ["NULL", "'${kanji.character}'", "'$kun'"]));
+        writeInsertToBuffer(buffer, "kun_yomi",
+            kanji.kun.map((kun) => ["NULL", "'${kanji.character}'", "'$kun'"]));
       }
 
       if (kanji.meanings.isNotEmpty) {
