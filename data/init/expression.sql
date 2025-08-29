@@ -148,3 +148,21 @@ CREATE TABLE r_ele_re_inf(
     FOREIGN KEY(id_re_inf) REFERENCES re_inf(id),
     PRIMARY KEY (id_r_ele, id_re_inf)
 );
+
+CREATE TABLE sense_xref (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_sense INTEGER,
+    primary_text STRING,
+    reading_text STRING,
+    target_sense_num INTEGER,
+    FOREIGN KEY(id_sense) REFERENCES sense(id)
+);
+
+CREATE TABLE sense_ant (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_sense INTEGER,
+    primary_text STRING,
+    reading_text STRING,
+    target_sense_num INTEGER,
+    FOREIGN KEY(id_sense) REFERENCES sense(id)
+);

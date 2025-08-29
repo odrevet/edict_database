@@ -5,6 +5,18 @@ import 'package:xml/xml.dart';
 
 import 'common.dart';
 
+class ParsedReference {
+  String primaryText;
+  String? readingText;
+  int? senseNum;
+  
+  ParsedReference({
+    required this.primaryText,
+    this.readingText,
+    this.senseNum,
+  });
+}
+
 class Entity {
   int id;
   String type;
@@ -78,6 +90,93 @@ Map<String, String> parsePriorityElement(XmlElement parent, String tagName) {
   });
 
   return priority;
+}
+
+bool isPureDigits(String text) {
+  if (text.isEmpty) return false;
+  
+  for (int i = 0; i < text.length; i++) {
+    int codeUnit = text.codeUnitAt(i);
+    // ASCII digits (0-9)
+    bool isAsciiDigit = codeUnit >= 0x30 && codeUnit <= 0x39;
+    // Fullwidth digits (０-９)
+    bool isFullwidthDigit = codeUnit >= 0xFF10 && codeUnit <= 0xFF19;
+    
+    if (!isAsciiDigit && !isFullwidthDigit) {
+      return false;
+    }
+  }
+  
+  return true;
+}
+
+ParsedReference parseReference(String refText) {
+  String trimmed = refText.trim();
+  List<String> parts = trimmed.split('・');
+  
+  String primaryText = parts[0];
+  String? readingText;
+  int? senseNum;
+  
+  if (parts.length == 1) {
+    // Pattern: just primary text
+  }
+  else if (parts.length == 2) {
+    String secondPart = parts[1];
+    
+    if (isPureDigits(secondPart)) {
+      // Pattern: primary・sense_number
+      senseNum = int.tryParse(secondPart);
+    } else {
+      // Pattern: primary・reading  
+      readingText = secondPart;
+    }
+  }
+  else if (parts.length == 3) {
+    // Pattern: primary・reading・sense_number
+    readingText = parts[1];
+    senseNum = int.tryParse(parts[2]);
+  }
+  
+  return ParsedReference(
+    primaryText: primaryText,
+    readingText: readingText,
+    senseNum: senseNum,
+  );
+}
+
+void writeXrefAntToBuffer(StringBuffer buffer, XmlElement sense, int senseId) {
+  // Process cross-references
+  for (var xrefElement in sense.findAllElements('xref')) {
+    String xrefText = xrefElement.innerText;
+    ParsedReference parsed = parseReference(xrefText);
+    
+    List<dynamic> values = [
+      "NULL", // id (auto-increment)
+      senseId,
+      "'${escape(parsed.primaryText)}'",
+      parsed.readingText != null ? "'${escape(parsed.readingText!)}'" : "NULL",
+      parsed.senseNum ?? "NULL"
+    ];
+    
+    writeInsertToBuffer(buffer, "sense_xref", [values]);
+  }
+  
+  // Process antonyms
+  for (var antElement in sense.findAllElements('ant')) {
+    String antText = antElement.innerText;
+    ParsedReference parsed = parseReference(antText);
+    
+    List<dynamic> values = [
+      "NULL", // id (auto-increment)
+      senseId,
+      "'${escape(parsed.primaryText)}'",
+      parsed.readingText != null ? "'${escape(parsed.readingText!)}'" : "NULL",
+      parsed.senseNum ?? "NULL"
+    ];
+    
+    writeInsertToBuffer(buffer, "sense_ant", [values]);
+  }
 }
 
 Map<String, List<String>?> bindElementReRestr(XmlElement entry) {
@@ -323,6 +422,9 @@ void main(List<String> args) {
             writeInsertToBuffer(buffer, "gloss", glossValues,
                 ["id_sense", "id_lang", "content"]);
           }
+
+          // Process cross-references and antonyms
+          writeXrefAntToBuffer(buffer, sense, idSense);
 
           idSense++;
         }
