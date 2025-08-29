@@ -6,14 +6,14 @@ import 'package:xml/xml.dart';
 import 'common.dart';
 
 class ParsedReference {
-  String primaryText;
-  String? readingText;
-  int? senseNum;
+  String keb;
+  String? reb;
+  int? senseNumber;
   
   ParsedReference({
-    required this.primaryText,
-    this.readingText,
-    this.senseNum,
+    required this.keb,
+    this.reb,
+    this.senseNumber,
   });
 }
 
@@ -114,9 +114,9 @@ ParsedReference parseReference(String refText) {
   String trimmed = refText.trim();
   List<String> parts = trimmed.split('・');
   
-  String primaryText = parts[0];
-  String? readingText;
-  int? senseNum;
+  String keb = parts[0];
+  String? reb;
+  int? senseNumber;
   
   if (parts.length == 1) {
     // Pattern: just primary text
@@ -126,22 +126,22 @@ ParsedReference parseReference(String refText) {
     
     if (isPureDigits(secondPart)) {
       // Pattern: primary・sense_number
-      senseNum = int.tryParse(secondPart);
+      senseNumber = int.tryParse(secondPart);
     } else {
       // Pattern: primary・reading  
-      readingText = secondPart;
+      reb = secondPart;
     }
   }
   else if (parts.length == 3) {
     // Pattern: primary・reading・sense_number
-    readingText = parts[1];
-    senseNum = int.tryParse(parts[2]);
+    reb = parts[1];
+    senseNumber = int.tryParse(parts[2]);
   }
   
   return ParsedReference(
-    primaryText: primaryText,
-    readingText: readingText,
-    senseNum: senseNum,
+    keb: keb,
+    reb: reb,
+    senseNumber: senseNumber,
   );
 }
 
@@ -154,9 +154,9 @@ void writeXrefAntToBuffer(StringBuffer buffer, XmlElement sense, int senseId) {
     List<dynamic> values = [
       "NULL", // id (auto-increment)
       senseId,
-      "'${escape(parsed.primaryText)}'",
-      parsed.readingText != null ? "'${escape(parsed.readingText!)}'" : "NULL",
-      parsed.senseNum ?? "NULL"
+      "'${escape(parsed.keb)}'",
+      parsed.reb != null ? "'${escape(parsed.reb!)}'" : "NULL",
+      parsed.senseNumber ?? "NULL"
     ];
     
     writeInsertToBuffer(buffer, "sense_xref", [values]);
@@ -170,9 +170,9 @@ void writeXrefAntToBuffer(StringBuffer buffer, XmlElement sense, int senseId) {
     List<dynamic> values = [
       "NULL", // id (auto-increment)
       senseId,
-      "'${escape(parsed.primaryText)}'",
-      parsed.readingText != null ? "'${escape(parsed.readingText!)}'" : "NULL",
-      parsed.senseNum ?? "NULL"
+      "'${escape(parsed.keb)}'",
+      parsed.reb != null ? "'${escape(parsed.reb!)}'" : "NULL",
+      parsed.senseNumber ?? "NULL"
     ];
     
     writeInsertToBuffer(buffer, "sense_ant", [values]);
