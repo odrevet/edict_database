@@ -63,7 +63,16 @@ while true; do
 
     if [ -f $db_path ]; then
       echo "Populating ${db_path}..."
-        echo "PRAGMA synchronous=OFF;PRAGMA journal_mode=OFF;PRAGMA temp_store=MEMORY;" | cat - $sql_generated_path | sqlite3 $db_path
+
+      {
+        echo "PRAGMA synchronous=OFF;"
+        echo "PRAGMA journal_mode=OFF;"
+        echo "PRAGMA temp_store=MEMORY;"
+        echo "PRAGMA cache_size=10000;"
+        echo "BEGIN TRANSACTION;"
+        cat $sql_generated_path
+        echo "COMMIT;"
+      } | sqlite3 $db_path
     else
       echo "file ${db_path} not found. "
     fi
