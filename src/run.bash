@@ -7,6 +7,7 @@ usage() {
   echo "--sql [languages]  generate sql from downloaded dictionary."
   echo "--init             create db file tables"
   echo "--populate         populate db file from generated sql"
+  echo "--compress         create a zip archive of the database file"
   echo "--clean [what]     delete db and/or sql file"
 }
 
@@ -62,7 +63,7 @@ while true; do
 
     if [ -f $db_path ]; then
       echo "Populating ${db_path}..."
-      echo "PRAGMA synchronous=OFF;PRAGMA journal_mode=OFF;PRAGMA temp_store=MEMORY;" | cat - $sql_generated_path | sqlite3 $db_path
+        echo "PRAGMA synchronous=OFF;PRAGMA journal_mode=OFF;PRAGMA temp_store=MEMORY;" | cat - $sql_generated_path | sqlite3 $db_path
     else
       echo "file ${db_path} not found. "
     fi
@@ -76,6 +77,24 @@ while true; do
       wget http://www.edrdg.org/kanjidic/kanjidic2.xml.gz --directory-prefix=data
       gunzip data/kanjidic2.xml.gz
     fi
+    shift
+    ;;
+  --compress)
+    db_path="data/generated/db/${subject}.db"
+    db_dir=$(dirname "$db_path")
+    db_filename=$(basename "$db_path")
+    zip_path="${db_dir}/${subject}.zip"
+
+    if [ ! -f $db_path ]; then
+      echo "Database file ${db_path} not found. Cannot compress."
+      exit 1
+    fi
+
+    echo "Compressing ${db_path} to ${zip_path}..."
+    cd "$db_dir"
+    zip "${subject}.zip" "$db_filename"
+    cd - > /dev/null
+    echo "Created compressed archive: ${zip_path}"
     shift
     ;;
   --clean)
