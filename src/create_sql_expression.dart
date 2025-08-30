@@ -145,11 +145,11 @@ ParsedReference parseReference(String refText) {
   );
 }
 
-void writeXrefAntToBuffer(StringBuffer buffer, XmlElement sense, int senseId) {
-  // Process cross-references
-  for (var xrefElement in sense.findAllElements('xref')) {
-    String xrefText = xrefElement.innerText;
-    ParsedReference parsed = parseReference(xrefText);
+// type: xref or ant
+void writeXrefAntToBuffer(StringBuffer buffer, String type, XmlElement sense, int senseId) {
+  for (var element in sense.findAllElements(type)) {
+    String text = element.innerText;
+    ParsedReference parsed = parseReference(text);
     
     List<dynamic> values = [
       "NULL", // id (auto-increment)
@@ -159,23 +159,7 @@ void writeXrefAntToBuffer(StringBuffer buffer, XmlElement sense, int senseId) {
       parsed.senseNumber ?? "NULL"
     ];
     
-    writeInsertToBuffer(buffer, "sense_xref", [values]);
-  }
-  
-  // Process antonyms
-  for (var antElement in sense.findAllElements('ant')) {
-    String antText = antElement.innerText;
-    ParsedReference parsed = parseReference(antText);
-    
-    List<dynamic> values = [
-      "NULL", // id (auto-increment)
-      senseId,
-      "'${escape(parsed.keb)}'",
-      parsed.reb != null ? "'${escape(parsed.reb!)}'" : "NULL",
-      parsed.senseNumber ?? "NULL"
-    ];
-    
-    writeInsertToBuffer(buffer, "sense_ant", [values]);
+    writeInsertToBuffer(buffer, "sense_$type", [values]);
   }
 }
 
@@ -424,7 +408,8 @@ void main(List<String> args) {
           }
 
           // Process cross-references and antonyms
-          writeXrefAntToBuffer(buffer, sense, idSense);
+          writeXrefAntToBuffer(buffer, 'xref' ,sense, idSense);
+          writeXrefAntToBuffer(buffer, 'ant' ,sense, idSense);
 
           idSense++;
         }
