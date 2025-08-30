@@ -32,7 +32,7 @@ class Entity {
 
 void writeEntityToBuffer(
         StringBuffer buffer, Map<String, List<Entity>> entities, String key) =>
-    writeInsertToBuffer(
+    addSqlInsertToBuffer(
         buffer,
         key,
         entities[key]!
@@ -46,7 +46,7 @@ void writeEntityRelationToBuffer(
         int id,
         Iterable<String> entitiesToWrite,
         String tableName) =>
-    writeInsertToBuffer(buffer, tableName, entitiesToWrite.map((entity) {
+    addSqlInsertToBuffer(buffer, tableName, entitiesToWrite.map((entity) {
       String entryEntityStr = entity.trim();
       entryEntityStr = entryEntityStr.substring(
           1, entryEntityStr.length - 1); //remove & and ;
@@ -159,7 +159,7 @@ void writeXrefAntToBuffer(StringBuffer buffer, String type, XmlElement sense, in
       parsed.senseNumber ?? "NULL"
     ];
     
-    writeInsertToBuffer(buffer, "sense_$type", [values]);
+    addSqlInsertToBuffer(buffer, "sense_$type", [values]);
   }
 }
 
@@ -211,7 +211,7 @@ List<dynamic> writeElementToBuffer(
         parsePriorityElement(element, '${type}e_pri');
     String insertedIdPriority = "NULL";
     if (priority.isNotEmpty) {
-      writeInsertToBuffer(buffer, "pri", [
+      addSqlInsertToBuffer(buffer, "pri", [
         [
           idPriority,
           idElement,
@@ -237,14 +237,14 @@ List<dynamic> writeElementToBuffer(
   }
 
   if (values.isNotEmpty) {
-    writeInsertToBuffer(buffer, tableName, values);
+    addSqlInsertToBuffer(buffer, tableName, values);
 
     if (type == "r") {
       var reRestrHash = bindElementReRestr(entry);
       reRestrHash.forEach((reRestrReb, reRestrKebList) {
         if (reRestrKebList == null && kEle != null) {
           for (var k in kEle) {
-            writeInsertToBuffer(buffer, "r_ele_k_ele", [
+            addSqlInsertToBuffer(buffer, "r_ele_k_ele", [
               [
                 "(SELECT id from r_ele WHERE id_entry = $entSeq AND reb = '$reRestrReb')",
                 k[0]
@@ -253,7 +253,7 @@ List<dynamic> writeElementToBuffer(
           }
         } else {
           for (var reRestrKeb in reRestrKebList!) {
-            writeInsertToBuffer(buffer, "r_ele_k_ele", [
+            addSqlInsertToBuffer(buffer, "r_ele_k_ele", [
               [
                 "(SELECT id from r_ele WHERE id_entry = $entSeq AND reb = '$reRestrReb')",
                 "(SELECT id from k_ele WHERE id_entry = $entSeq AND keb = '$reRestrKeb')"
@@ -275,7 +275,7 @@ void main(List<String> args) {
   File('data/JMdict').readAsString().then((String contents) {
     final buffer = StringBuffer();
 
-    writeInsertToBuffer(buffer, "lang",
+    addSqlInsertToBuffer(buffer, "lang",
         langs.asMap().entries.map((e) => [e.key + 1, "'${e.value}'"]));
 
     print("parsing...");
@@ -377,7 +377,7 @@ void main(List<String> args) {
         }
 
         if (langs.contains(lang)) {
-          writeInsertToBuffer(buffer, "sense", [
+          addSqlInsertToBuffer(buffer, "sense", [
             [idSense, entSeq]
           ], [
             "id",
@@ -403,7 +403,7 @@ void main(List<String> args) {
           }
 
           if (glossValues.isNotEmpty) {
-            writeInsertToBuffer(buffer, "gloss", glossValues,
+            addSqlInsertToBuffer(buffer, "gloss", glossValues,
                 ["id_sense", "id_lang", "content"]);
           }
 

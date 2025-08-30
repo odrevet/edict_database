@@ -2,7 +2,7 @@ String escape(String value) {
   return value.replaceAll('\'', '\'\'');
 }
 
-void writeInsertToBuffer(
+void addSqlInsertToBuffer(
     StringBuffer buffer, String tableName, Iterable<Iterable<dynamic>> values,
     [List<String> fields = const []]) {
   String fieldsStr = fields.isNotEmpty ? '(${fields.join(',')})' : '';

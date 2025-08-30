@@ -142,17 +142,17 @@ void main(List<String> args) async {
 
     final buffer = StringBuffer();
 
-    writeInsertToBuffer(buffer, "lang",
+    addSqlInsertToBuffer(buffer, "lang",
         langs.asMap().entries.map((e) => [e.key + 1, "'${e.value}'"]));
 
     //Generate the SQL from the List of Kanji
     for (var kanji in kanjis) {
-      writeInsertToBuffer(buffer, "character", [
+      addSqlInsertToBuffer(buffer, "character", [
         ["'${kanji.character}'", kanji.stroke, kanji.freq, kanji.jlpt]
       ]);
 
       if (kanji.radicals.isNotEmpty) {
-        writeInsertToBuffer(
+        addSqlInsertToBuffer(
             buffer,
             "character_radical",
             kanji.radicals
@@ -160,17 +160,17 @@ void main(List<String> args) async {
       }
 
       if (kanji.on.isNotEmpty) {
-        writeInsertToBuffer(buffer, "on_yomi",
+        addSqlInsertToBuffer(buffer, "on_yomi",
             kanji.on.map((on) => ["NULL", "'${kanji.character}'", "'$on'"]));
       }
 
       if (kanji.kun.isNotEmpty) {
-        writeInsertToBuffer(buffer, "kun_yomi",
+        addSqlInsertToBuffer(buffer, "kun_yomi",
             kanji.kun.map((kun) => ["NULL", "'${kanji.character}'", "'$kun'"]));
       }
 
       if (kanji.meanings.isNotEmpty) {
-        writeInsertToBuffer(
+        addSqlInsertToBuffer(
             buffer,
             "meaning",
             kanji.meanings.map((meaning) => [
