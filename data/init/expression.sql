@@ -110,6 +110,7 @@ CREATE TABLE sense_dial(
 CREATE TABLE sense_xref (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     id_sense INTEGER,
+    id_sense_ref INTEGER,
     keb STRING,
     reb STRING,
     sense_number INTEGER,
@@ -119,6 +120,7 @@ CREATE TABLE sense_xref (
 CREATE TABLE sense_ant (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     id_sense INTEGER,
+    id_sense_ref INTEGER,
     keb STRING,
     reb STRING,
     sense_number INTEGER,

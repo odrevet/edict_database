@@ -150,10 +150,13 @@ void writeXrefAntToBuffer(StringBuffer buffer, XmlElement sense, int senseId) {
   for (var xrefElement in sense.findAllElements('xref')) {
     String xrefText = xrefElement.innerText;
     ParsedReference parsed = parseReference(xrefText);
-    
+
+    String sqlGetRefIdSense = "(SELECT sense.id FROM sense JOIN entry ON entry.id = sense.id_entry JOIN k_ele ON entry.id = k_ele.id_entry WHERE k_ele.keb = '${parsed.keb}' LIMIT 1)";
+
     List<dynamic> values = [
       "NULL", // id (auto-increment)
       senseId,
+      sqlGetRefIdSense,
       "'${escape(parsed.keb)}'",
       parsed.reb != null ? "'${escape(parsed.reb!)}'" : "NULL",
       parsed.senseNumber ?? "NULL"
@@ -166,10 +169,12 @@ void writeXrefAntToBuffer(StringBuffer buffer, XmlElement sense, int senseId) {
   for (var antElement in sense.findAllElements('ant')) {
     String antText = antElement.innerText;
     ParsedReference parsed = parseReference(antText);
-    
+    String sqlGetRefIdSense = "(SELECT sense.id FROM sense JOIN entry ON entry.id = sense.id_entry JOIN k_ele ON entry.id = k_ele.id_entry WHERE k_ele.keb = '${parsed.keb}' LIMIT 1)";
+
     List<dynamic> values = [
       "NULL", // id (auto-increment)
       senseId,
+      sqlGetRefIdSense,
       "'${escape(parsed.keb)}'",
       parsed.reb != null ? "'${escape(parsed.reb!)}'" : "NULL",
       parsed.senseNumber ?? "NULL"
