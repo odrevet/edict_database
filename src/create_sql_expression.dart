@@ -32,7 +32,7 @@ class Entity {
 
 void writeEntityToBuffer(
         StringBuffer buffer, Map<String, List<Entity>> entities, String key) =>
-    writeInsertToBuffer(
+    addSqlInsertToBuffer(
         buffer,
         key,
         entities[key]!
@@ -46,7 +46,7 @@ void writeEntityRelationToBuffer(
         int id,
         Iterable<String> entitiesToWrite,
         String tableName) =>
-    writeInsertToBuffer(buffer, tableName, entitiesToWrite.map((entity) {
+    addSqlInsertToBuffer(buffer, tableName, entitiesToWrite.map((entity) {
       String entryEntityStr = entity.trim();
       entryEntityStr = entryEntityStr.substring(
           1, entryEntityStr.length - 1); //remove & and ;
@@ -145,12 +145,11 @@ ParsedReference parseReference(String refText) {
   );
 }
 
-void writeXrefAntToBuffer(StringBuffer buffer, XmlElement sense, int senseId) {
-  // Process cross-references
-  for (var xrefElement in sense.findAllElements('xref')) {
-    String xrefText = xrefElement.innerText;
-    ParsedReference parsed = parseReference(xrefText);
-
+// type: xref or ant
+void writeXrefAntToBuffer(StringBuffer buffer, String type, XmlElement sense, int senseId) {
+  for (var element in sense.findAllElements(type)) {
+    String text = element.innerText;
+    ParsedReference parsed = parseReference(text);
     String sqlGetRefIdSense = "(SELECT sense.id FROM sense JOIN entry ON entry.id = sense.id_entry JOIN k_ele ON entry.id = k_ele.id_entry WHERE k_ele.keb = '${parsed.keb}' LIMIT 1)";
 
     List<dynamic> values = [
@@ -162,25 +161,7 @@ void writeXrefAntToBuffer(StringBuffer buffer, XmlElement sense, int senseId) {
       parsed.senseNumber ?? "NULL"
     ];
     
-    writeInsertToBuffer(buffer, "sense_xref", [values]);
-  }
-  
-  // Process antonyms
-  for (var antElement in sense.findAllElements('ant')) {
-    String antText = antElement.innerText;
-    ParsedReference parsed = parseReference(antText);
-    String sqlGetRefIdSense = "(SELECT sense.id FROM sense JOIN entry ON entry.id = sense.id_entry JOIN k_ele ON entry.id = k_ele.id_entry WHERE k_ele.keb = '${parsed.keb}' LIMIT 1)";
-
-    List<dynamic> values = [
-      "NULL", // id (auto-increment)
-      senseId,
-      sqlGetRefIdSense,
-      "'${escape(parsed.keb)}'",
-      parsed.reb != null ? "'${escape(parsed.reb!)}'" : "NULL",
-      parsed.senseNumber ?? "NULL"
-    ];
-    
-    writeInsertToBuffer(buffer, "sense_ant", [values]);
+    addSqlInsertToBuffer(buffer, "sense_$type", [values]);
   }
 }
 
@@ -232,7 +213,7 @@ List<dynamic> writeElementToBuffer(
         parsePriorityElement(element, '${type}e_pri');
     String insertedIdPriority = "NULL";
     if (priority.isNotEmpty) {
-      writeInsertToBuffer(buffer, "pri", [
+      addSqlInsertToBuffer(buffer, "pri", [
         [
           idPriority,
           idElement,
@@ -258,14 +239,14 @@ List<dynamic> writeElementToBuffer(
   }
 
   if (values.isNotEmpty) {
-    writeInsertToBuffer(buffer, tableName, values);
+    addSqlInsertToBuffer(buffer, tableName, values);
 
     if (type == "r") {
       var reRestrHash = bindElementReRestr(entry);
       reRestrHash.forEach((reRestrReb, reRestrKebList) {
         if (reRestrKebList == null && kEle != null) {
           for (var k in kEle) {
-            writeInsertToBuffer(buffer, "r_ele_k_ele", [
+            addSqlInsertToBuffer(buffer, "r_ele_k_ele", [
               [
                 "(SELECT id from r_ele WHERE id_entry = $entSeq AND reb = '$reRestrReb')",
                 k[0]
@@ -274,7 +255,7 @@ List<dynamic> writeElementToBuffer(
           }
         } else {
           for (var reRestrKeb in reRestrKebList!) {
-            writeInsertToBuffer(buffer, "r_ele_k_ele", [
+            addSqlInsertToBuffer(buffer, "r_ele_k_ele", [
               [
                 "(SELECT id from r_ele WHERE id_entry = $entSeq AND reb = '$reRestrReb')",
                 "(SELECT id from k_ele WHERE id_entry = $entSeq AND keb = '$reRestrKeb')"
@@ -296,7 +277,7 @@ void main(List<String> args) {
   File('data/JMdict').readAsString().then((String contents) {
     final buffer = StringBuffer();
 
-    writeInsertToBuffer(buffer, "lang",
+    addSqlInsertToBuffer(buffer, "lang",
         langs.asMap().entries.map((e) => [e.key + 1, "'${e.value}'"]));
 
     print("parsing...");
@@ -398,7 +379,7 @@ void main(List<String> args) {
         }
 
         if (langs.contains(lang)) {
-          writeInsertToBuffer(buffer, "sense", [
+          addSqlInsertToBuffer(buffer, "sense", [
             [idSense, entSeq]
           ], [
             "id",
@@ -424,12 +405,13 @@ void main(List<String> args) {
           }
 
           if (glossValues.isNotEmpty) {
-            writeInsertToBuffer(buffer, "gloss", glossValues,
+            addSqlInsertToBuffer(buffer, "gloss", glossValues,
                 ["id_sense", "id_lang", "content"]);
           }
 
           // Process cross-references and antonyms
-          writeXrefAntToBuffer(buffer, sense, idSense);
+          writeXrefAntToBuffer(buffer, 'xref' ,sense, idSense);
+          writeXrefAntToBuffer(buffer, 'ant' ,sense, idSense);
 
           idSense++;
         }
