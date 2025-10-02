@@ -117,10 +117,12 @@ while true; do
 
     if [ "$what" = "sql" ] || [ "$what" = "" ]; then
       rm "data/generated/sql/${subject}.sql"
+      rm "data/generated/sql/${subject}.zip"
     fi
 
     if [ "$what" = "db" ] || [ "$what" = "" ]; then
       rm "data/generated/db/${subject}.db"
+      rm "data/generated/db/${subject}.zip"
     fi
     ;;
   *) break ;;
