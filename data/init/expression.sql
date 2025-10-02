@@ -186,17 +186,14 @@ CREATE INDEX idx_sense_ant_sense ON sense_ant(id_sense);
 CREATE INDEX idx_gloss_content_sense ON gloss(content, id_sense);
 
 -- COVERING INDEXES
--- eliminate table lookups but increase storage
+-- eliminate table lookups
 CREATE INDEX idx_r_ele_entry_reb ON r_ele(id_entry, reb);
 CREATE INDEX idx_k_ele_entry_keb ON k_ele(id_entry, keb);
 CREATE INDEX idx_gloss_sense_content_lang ON gloss(id_sense, content, id_lang);
 
 -- REVERSE JUNCTION LOOKUPS
 -- when search "which senses have this POS?"
-CREATE INDEX idx_sense_pos_pos ON sense_pos(id_pos);
-CREATE INDEX idx_sense_misc_misc ON sense_misc(id_misc);
-CREATE INDEX idx_sense_dial_dial ON sense_dial(id_dial);
-CREATE INDEX idx_sense_field_field ON sense_field(id_field);
-
-ANALYZE;
-
+-- CREATE INDEX idx_sense_pos_pos ON sense_pos(id_pos);
+-- CREATE INDEX idx_sense_misc_misc ON sense_misc(id_misc);
+-- CREATE INDEX idx_sense_dial_dial ON sense_dial(id_dial);
+-- CREATE INDEX idx_sense_field_field ON sense_field(id_field);

@@ -72,6 +72,7 @@ while true; do
         echo "BEGIN TRANSACTION;"
         cat $sql_generated_path
         echo "COMMIT;"
+        echo "ANALYZE;"
       } | sqlite3 $db_path
     else
       echo "file ${db_path} not found. "
