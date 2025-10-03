@@ -31,24 +31,24 @@ sudo apt install sqlite3
 
 Bash scripts `src/run.bash` can be called with arguments
 
-    bash run.bash <kanji|expression|help> [arguments]
-    arguments:
-    --download         download JMdict (expression) or kanjidic2 (kanji)
-    --sql [languages]  generate sql from downloaded dictionary.
-    --init             create db file tables
-    --populate         populate db file from generated sql
-    --clean [what]     delete db and/or sql file
+```
+arguments:
+--download           download JMdict (expression) or kanjidic2 (kanji)
+--sql [languages]    generate sql from downloaded dictionary.
+--init               create db file tables
+--populate           populate db file from generated sql
+--compress [zip|xz]  create a compressed archive of the database file
+--clean [what]       delete db and/or sql file
+```
 
-
-
-Example: Reset previously generated expression database, generate sql for english sense and populate the db: 
+Example: Reset previously generated expression database, generate sql for english sense and populate the db and compress: 
 
 ```bash
-bash src/run.bash expression --clean --init --sql "eng" --populate
+bash src/run.bash expression --clean --init --sql "eng" --populate --compress "zip" --compress "xz"
 ```
 
 ```bash
-bash src/run.bash kanji --clean --init --sql "en" --populate
+bash src/run.bash kanji --clean --init --sql "en" --populate --compress "zip" --compress "xz"
 ```
 
 # Generate sql for selected languages

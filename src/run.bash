@@ -3,12 +3,12 @@
 usage() {
   echo "bash run.bash <kanji|expression|help> [arguments]"
   echo "arguments: "
-  echo "--download         download JMdict (expression) or kanjidic2 (kanji)"
-  echo "--sql [languages]  generate sql from downloaded dictionary."
-  echo "--init             create db file tables"
-  echo "--populate         populate db file from generated sql"
-  echo "--compress         create a zip archive of the database file"
-  echo "--clean [what]     delete db and/or sql file"
+  echo "--download           download JMdict (expression) or kanjidic2 (kanji)"
+  echo "--sql [languages]    generate sql from downloaded dictionary."
+  echo "--init               create db file tables"
+  echo "--populate           populate db file from generated sql"
+  echo "--compress [zip|xz]  create a compressed archive of the database file"
+  echo "--clean [what]       delete db and/or sql file"
 }
 
 subject=$1
@@ -90,22 +90,54 @@ while true; do
     shift
     ;;
   --compress)
+    shift
+    format="zip"
+
+    # Check if next argument is a compression format
+    if [[ $2 == "zip" ]] || [[ $2 == "xz" ]]; then
+      format=$2
+      shift
+    fi
+
     db_path="data/generated/db/${subject}.db"
     db_dir=$(dirname "$db_path")
     db_filename=$(basename "$db_path")
-    zip_path="${db_dir}/${subject}.zip"
 
     if [ ! -f $db_path ]; then
       echo "Database file ${db_path} not found. Cannot compress."
       exit 1
     fi
 
-    echo "Compressing ${db_path} to ${zip_path}..."
-    cd "$db_dir"
-    zip "${subject}.zip" "$db_filename"
-    cd - > /dev/null
-    echo "Created compressed archive: ${zip_path}"
-    shift
+    if [ "$format" = "zip" ]; then
+      # Check if zip is available
+      if ! command -v zip &> /dev/null; then
+        echo "Error: zip command not found. Please install zip or use xz format."
+        exit 1
+      fi
+
+      archive_path="${db_dir}/${subject}.zip"
+      echo "Compressing ${db_path} to ${archive_path}..."
+      zip -j "${archive_path}" "$db_path"
+      echo "Created compressed archive: ${archive_path}"
+
+    elif [ "$format" = "xz" ]; then
+      # Check if xz is available
+      if ! command -v xz &> /dev/null; then
+        echo "Error: xz command not found. Please install xz-utils or use zip format."
+        exit 1
+      fi
+
+      archive_path="${db_dir}/${subject}.xz"
+      echo "Compressing ${db_path} to ${archive_path}..."
+      # Use -c to write to stdout, redirect to archive file
+      xz -9 -c "$db_path" > "${archive_path}"
+      echo "Created compressed archive: ${archive_path}"
+
+    else
+      echo "Unknown compression format: ${format}"
+      echo "Supported formats: zip, xz"
+      exit 1
+    fi
     ;;
   --clean)
     shift
@@ -116,13 +148,13 @@ while true; do
     fi
 
     if [ "$what" = "sql" ] || [ "$what" = "" ]; then
-      rm "data/generated/sql/${subject}.sql"
-      rm "data/generated/sql/${subject}.zip"
+      rm -f "data/generated/sql/${subject}.sql"
     fi
 
     if [ "$what" = "db" ] || [ "$what" = "" ]; then
-      rm "data/generated/db/${subject}.db"
-      rm "data/generated/db/${subject}.zip"
+      rm -f "data/generated/db/${subject}.db"
+      rm -f "data/generated/db/${subject}.zip"
+      rm -f "data/generated/db/${subject}.xz"
     fi
     ;;
   *) break ;;
