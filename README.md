@@ -20,23 +20,6 @@ Download required packages with
 
 `dart pub get`
 
-## Utils required binaries
-
-`bash` scripts are in the `src` directory to download dictionaries with `wget` and uncompressed them with `gunzip`.
-
-
-## Generate .db 
-
-sqlite3 db files are created and populated using the `sqlite3` binary.
-
-```bash
-sudo apt install sqlite3
-```
-
-## Populate Postgres
-
-Postgres database is populated using `psql`. 
-
 
 # Generate sql for selected languages
 
@@ -45,8 +28,6 @@ Postgres database is populated using `psql`.
 * to SQL scripts
 
 The `src/to_sql_expression.dart` and `src/to_sql_kanji.dart`
-
-
 
 Options : 
 
@@ -65,9 +46,13 @@ English only
 dart src/to_sql_expression.dart --langs "eng"
 ```
 
-```
+```bash
 dart src/to_sql_kanji.dart en
 ```
+
+The `src/to_sql_expression.dart` and `src/to_sql_kanji.dart`
+
+* to CSV scripts
 
 # generated files
 
@@ -91,24 +76,50 @@ Bash scripts under `scripts` that helps download files, init, populate the datab
 
 For all the scripts the first argument musy be `expression` or `kanji`. 
 
-* scripts/run.sh : 
-* * --download: download EDICT or kanjidict, generateclear generated SQL or CSV 
-* * --clean: Clean generated SQL
-* * --sql: generate SQL
-* * --csv: generate CSV
+## scripts/run.sh
 
-* scripts/sqlite.sh:
-* * --init : Create sqlite file and init table and indexes
-* * --populate : Use previously generated SQL to insert data 
-* * --compress : compress the sqlite
-* * --clean : remove the database
+* download dictionaries with `wget` and uncompressed them with `gunzip`.
 
-* scripts/postgres.sh:
-* * --init : Create sqlite file and init table and indexes
-* * --populate : Use previously generated CSV to copy data
-* * --clean : remove the database
+* `--download`: Download JMdict and KANJIDIC2/RADKFILE source files
+* `--clean`: Clear generated SQL or CSV files
+* `--sql`: Generate SQL insert statements
+* `--csv`: Generate CSV files
+
+## scripts/sqlite.sh
+
+sqlite3 db files are created and populated using the `sqlite3` binary.
+
+```bash
+sudo apt install sqlite3
+```
+
+* Options: 
+
+* `--init`: Create SQLite database file with tables and indexes
+* `--populate`: Insert data using previously generated SQL
+* `--compress`: Compress the SQLite database
+* `--clean`: Remove the database
+
+## scripts/postgres.sh
+
+* Deps
+
+Postgres database is populated using `psql`.
+
+* Options: 
+
+* `--init`: Create PostgreSQL database with tables and indexes
+* `--populate`: Import data using previously generated CSV files via COPY
+* `--clean`: Remove the database
 
 ## Helper scripts examples 
+
+First download the dictionaries
+
+```
+bash scripts/run.bash expression --download
+bash scripts/run.bash kanji --download
+```
 
 ### sqlite 
 
