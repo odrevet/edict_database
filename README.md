@@ -93,8 +93,6 @@ sqlite3 db files are created and populated using the `sqlite3` binary.
 sudo apt install sqlite3
 ```
 
-* Options: 
-
 * `--init`: Create SQLite database file with tables and indexes
 * `--populate`: Insert data using previously generated SQL
 * `--compress`: Compress the SQLite database
@@ -102,11 +100,8 @@ sudo apt install sqlite3
 
 ## scripts/postgres.sh
 
-* Deps
 
 Postgres database is populated using `psql`.
-
-* Options: 
 
 * `--init`: Create PostgreSQL database with tables and indexes
 * `--populate`: Import data using previously generated CSV files via COPY
