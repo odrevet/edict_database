@@ -27,7 +27,7 @@ Download required packages with
 
 * to SQL scripts
 
-The `src/to_sql_expression.dart` and `src/to_sql_kanji.dart`
+Using `src/to_sql_expression.dart` and `src/to_sql_kanji.dart`
 
 Options : 
 
@@ -50,9 +50,10 @@ dart src/to_sql_expression.dart --langs "eng"
 dart src/to_sql_kanji.dart en
 ```
 
-The `src/to_sql_expression.dart` and `src/to_sql_kanji.dart`
 
 * to CSV scripts
+
+Using `src/to_csv_expression.dart` and `src/to_csv_kanji.dart`
 
 # generated files
 
