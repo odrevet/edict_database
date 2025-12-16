@@ -6,7 +6,7 @@ environment:
   sdk: ^3.8.1
 
 dependencies:
-  xml: ^6.6.0
+  xml: ^6.6.1
 
 dev_dependencies:
   lints: ^6.0.0

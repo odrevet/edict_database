@@ -2,7 +2,7 @@ This directory contains data (.xml, .sql, .db)
 
 # JMDict and kanjidict2.xml files
 
-JMDict and kanjidict2.xml files are respectivly the JMDict dictionary and the kanjidict2 dictionary in there xml format.
+JMDict and kanjidict2.xml files are respectively the JMDict dictionary and the kanjidict2 dictionary in there xml format.
 
 This is from these two file that we will generate the sql and db files.
 
@@ -22,9 +22,9 @@ Contains the sql instructions to create the database structure
 
 ## sql
 
-contains the sql with insert statments generated from JMDict and kanjidict2.xml files
+contains the sql with insert statements generated from JMDict and kanjidict2.xml files
 
-This directory is empty by default, generated sql files are shipped separatly with each release
+This directory is empty by default, generated sql files are shipped separately with each release
 
 ## db
 
@@ -32,4 +32,4 @@ contains generated sqlite db file from sql files
 
 .db file are initialized with there hierarchical structure with file in the init directory, they are then populated with the data from generated/sql
 
-This directory is empty by default, generated db files are shipped separatly with each release
+This directory is empty by default, generated db files are shipped separately with each release

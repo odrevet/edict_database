@@ -1,0 +1,1 @@
+SELECT * FROM radical ORDER BY stroke_count;

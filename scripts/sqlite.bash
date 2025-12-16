@@ -3,12 +3,10 @@
 usage() {
   echo "bash run.bash <kanji|expression|help> [arguments]"
   echo "arguments: "
-  echo "--download           download JMdict (expression) or kanjidic2 (kanji)"
-  echo "--sql [languages]    generate sql from downloaded dictionary."
   echo "--init               create db file tables"
   echo "--populate           populate db file from generated sql"
   echo "--compress [zip|xz]  create a compressed archive of the database file"
-  echo "--clean [what]       delete db and/or sql file"
+  echo "--clean              wipe databases"
 }
 
 subject=$1
@@ -28,21 +26,9 @@ while true; do
   action=$2
   echo $action
   case "$2" in
-  --sql)
-    shift
-
-    languages=""
-    if [[ $2 != --* ]]; then
-      languages=$2
-      shift
-    fi
-
-    dart "src/create_sql_${subject}.dart" $languages
-
-    ;;
   --init)
     db_path="data/generated/db/${subject}.db"
-    sql_init_path="data/init/${subject}.sql"
+    sql_init_path="data/init/sqlite/${subject}.sql"
 
     if [ ! -f $db_path ]; then
       sqlite3 $db_path <$sql_init_path
@@ -76,16 +62,6 @@ while true; do
       } | sqlite3 $db_path
     else
       echo "file ${db_path} not found. "
-    fi
-    shift
-    ;;
-  --download)
-    if [ "$subject" = "expression" ]; then
-      wget ftp://ftp.edrdg.org/pub/Nihongo/JMdict.gz --directory-prefix=data
-      gunzip data/JMdict.gz
-    else
-      wget http://www.edrdg.org/kanjidic/kanjidic2.xml.gz --directory-prefix=data
-      gunzip data/kanjidic2.xml.gz
     fi
     shift
     ;;
@@ -140,22 +116,10 @@ while true; do
     fi
     ;;
   --clean)
+    rm -f "data/generated/db/${subject}.db"
+    rm -f "data/generated/db/${subject}.zip"
+    rm -f "data/generated/db/${subject}.xz"
     shift
-    what=""
-    if [[ $2 != --* ]]; then
-      what=$2
-      shift
-    fi
-
-    if [ "$what" = "sql" ] || [ "$what" = "" ]; then
-      rm -f "data/generated/sql/${subject}.sql"
-    fi
-
-    if [ "$what" = "db" ] || [ "$what" = "" ]; then
-      rm -f "data/generated/db/${subject}.db"
-      rm -f "data/generated/db/${subject}.zip"
-      rm -f "data/generated/db/${subject}.xz"
-    fi
     ;;
   *) break ;;
   esac
