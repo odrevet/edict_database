@@ -1,3 +1,8 @@
+CREATE SCHEMA IF NOT EXISTS expression;
+
+SET search_path TO expression;
+
+
 CREATE TABLE lang(
     id SMALLSERIAL PRIMARY KEY,
     iso3 CHAR(3) NOT NULL UNIQUE

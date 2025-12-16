@@ -1,3 +1,7 @@
+CREATE SCHEMA IF NOT EXISTS kanji;
+
+SET search_path TO kanji;
+
 CREATE TABLE lang(
     id SMALLSERIAL PRIMARY KEY,
     iso2 CHAR(2) NOT NULL UNIQUE
@@ -20,7 +24,7 @@ VALUES
     ('ヨ', 3);
 
 -- Import character table
-\copy character FROM 'data/generated/csv/kanji/character.csv' WITH (FORMAT csv, HEADER true, NULL '');
+\copy kanji.character FROM 'data/generated/csv/kanji/character.csv' WITH (FORMAT csv, HEADER true, NULL '');
 
 CREATE TABLE radical(
     id CHAR(1) PRIMARY KEY,

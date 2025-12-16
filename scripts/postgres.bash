@@ -34,7 +34,7 @@ while true; do
     shift
     ;;
   --clean)
-    psql -U postgres -d edict -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
+    psql -U postgres -d edict -c "DROP SCHEMA ${subject} CASCADE; CREATE SCHEMA ${subject};"
     shift
     ;;
   *) break ;;

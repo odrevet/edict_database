@@ -168,10 +168,11 @@ docker exec -i -w /workspace postgres-container bash scripts/postgres.bash expre
 docker exec -i -w /workspace postgres-container bash scripts/postgres.bash kanji --init --populate
 ```
 
-* Wipe database (expression or kanji option does not matters)
+* Wipe schema
 
 ```
 docker exec -i -w /workspace postgres-container bash scripts/postgres.bash expression --clean
+docker exec -i -w /workspace postgres-container bash scripts/postgres.bash kanji --clean
 ```
 
 * Interactive session
