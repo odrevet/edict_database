@@ -1,6 +1,12 @@
 # Goal
 
-Generate Sqlite relational databases from the JMDICT japanese dictionary.
+Generate SQLite and PostgreSQL relational databases from Japanese dictionary data sources:
+
+- **JMdict**: Japanese-multilingual dictionary data (expression/vocabulary entries)
+- **KANJIDIC2**: Comprehensive kanji character information
+- **RADKFILE**: Kanji radical decomposition data
+
+The tool produces SQL schemas for SQLite, as well as CSV exports, used by PostgreSQL.
 
 # setup
 
@@ -27,59 +33,40 @@ sqlite3 db files are created and populated using the `sqlite3` binary.
 sudo apt install sqlite3
 ```
 
-# run.bash
+## Populate Postgres
 
-Bash scripts under `scripts` that helps download files, init, populate the databases
+Postgres database is populated using `psql`. 
 
-```
-arguments:
---download                    download JMdict (expression) or kanjidic2 (kanji)
---sql [languages] [maxInsert] generate sql from downloaded dictionary.
---csv [languages]             generate sql from downloaded dictionary.
-```
-
-Example: Reset previously generated expression database, generate sql for english sense and populate the db and compress: 
-
-* For expression
-
-```bash
-bash scripts/run.bash expression --clean --init --sql "eng"
-bash scripts/sqlite.bash expression --populate --compress "zip" --compress "xz"
-```
-
-* For kanji
-
-```bash
-bash scripts/run.bash kanji --clean --init --sql "en"
-bash scripts/sqlite.bash kanji --populate --compress "zip" --compress "xz"
-```
 
 # Generate sql for selected languages
 
-The `src/to_sql_expression.dart` and `src/to_sql_kanji.dart` scripts can be called with arguments to process only some languages.
+`SQL` or `CSV` are generated using `dart` under the `src` directory.
 
-The languages are in ISO 639-3 format for expression and ISO 639-2 for kanji, for example: 
+* to SQL scripts
+
+The `src/to_sql_expression.dart` and `src/to_sql_kanji.dart`
+
+
+
+Options : 
+
+* --langs languages to process (gloss or meanings), comma separated list The languages are in ISO 639-3 format for expression and ISO 639-2 for kanji
+* --max-inserts How many VALUES per INSERT in the generated SQL. 0 for all VALUES. 
 
 English and French
 
 ```bash
-dart src/to_sql_expression.dart eng fre
+dart src/to_sql_expression.dart --langs "eng,fre" --max-inserts 1
 ```
 
 English only
 
 ```bash
-dart src/to_sql_expression.dart eng
+dart src/to_sql_expression.dart --langs "eng"
 ```
 
 ```
 dart src/to_sql_kanji.dart en
-```
-
-note: `run.bash`  allow to pass language arguments with quotes, for example: 
-
-```bash
-bash scripts/run.bash expression --sql "eng,fre"
 ```
 
 # generated files
@@ -96,9 +83,54 @@ sqlite3 data/generated/db/expression.db
 sqlite3 data/generated/db/kanji.db
 ```
 
-# postgres using docker
+# Helper scripts
 
-* Download the image and create a container
+Instead of calling dart directly, helper bash scripts under the `scripts` directory can be used. 
+
+Bash scripts under `scripts` that helps download files, init, populate the databases
+
+For all the scripts the first argument musy be `expression` or `kanji`. 
+
+* scripts/run.sh : 
+* * --download: download EDICT or kanjidict, generateclear generated SQL or CSV 
+* * --clean: Clean generated SQL
+* * --sql: generate SQL
+* * --csv: generate CSV
+
+* scripts/sqlite.sh:
+* * --init : Create sqlite file and init table and indexes
+* * --populate : Use previously generated SQL to insert data 
+* * --compress : compress the sqlite
+* * --clean : remove the database
+
+* scripts/postgres.sh:
+* * --init : Create sqlite file and init table and indexes
+* * --populate : Use previously generated CSV to copy data
+* * --clean : remove the database
+
+## Helper scripts examples 
+
+### sqlite 
+
+generate sql for english sense and populate the db and compress:
+
+* For expression
+
+```bash
+bash scripts/run.bash expression --sql "eng"
+bash scripts/sqlite.bash expression --clean --init --populate --compress "zip" --compress "xz"
+```
+
+* For kanji
+
+```bash
+bash scripts/run.bash kanji --clean --init --sql "en"
+bash scripts/sqlite.bash kanji --populate --compress "zip" --compress "xz"
+```
+
+### postgres using docker
+
+* Create a container
 
 ```
 docker run -v "$(pwd):/workspace" \
@@ -140,7 +172,6 @@ docker exec -i -w /workspace postgres-container bash scripts/postgres.bash expre
 ```
 docker exec -it -w /workspace postgres-container psql -U postgres -d edict
 ```
-
 
 # Documentation
 

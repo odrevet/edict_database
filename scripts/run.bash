@@ -5,7 +5,7 @@ usage() {
   echo "arguments: "
   echo "--download                    download JMdict (expression) or kanjidic2 (kanji)"
   echo "--sql [languages][maxinsert]  generate sql from downloaded dictionary."
-  echo "--sql [languages]             generate csv from downloaded dictionary."
+  echo "--csv [languages]             generate csv from downloaded dictionary."
   echo "--clean                       remove generated sql file"
 }
 
