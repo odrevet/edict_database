@@ -3,12 +3,17 @@ name: Release
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   release:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: dart-lang/setup-dart@v1
 
@@ -18,41 +23,40 @@ jobs:
       - name: Install dart packages
         run: dart pub get
 
+      - name: Bump version
+        id: version
+        run: |
+          current=$(grep -m1 '^version:' pubspec.yaml | sed -E 's/version:\s*//')
+          IFS='.' read -r major minor patch <<< "$current"
+          new="${major}.${minor}.$((patch + 1))"
+          sed -i "s/^version: .*/version: ${new}/" pubspec.yaml
+          echo "new_version=${new}" >> "$GITHUB_OUTPUT"
+
+      - name: Commit version bump
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add pubspec.yaml
+          git commit -m "chore: bump version to ${{ steps.version.outputs.new_version }}"
+          git tag "v${{ steps.version.outputs.new_version }}"
+          git push origin HEAD --tags
+
       - name: Run release
         run: |
           chmod +x scripts/release.bash
           bash scripts/release.bash
           cat data/generated/RELEASE.md >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Upload release notes
-        uses: actions/upload-artifact@v4
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
         with:
-          name: release-notes
-          path: data/generated/RELEASE.md
-
-      - name: Upload SQLite databases
-        uses: actions/upload-artifact@v4
-        with:
-          name: sqlite-databases
-          path: |
+          tag_name: "v${{ steps.version.outputs.new_version }}"
+          name: "v${{ steps.version.outputs.new_version }}"
+          body_path: data/generated/RELEASE.md
+          files: |
             data/generated/db/sqlite/*.db
             data/generated/db/sqlite/*.xz
             data/generated/db/sqlite/*.zip
-
-      - name: Upload SQL dumps
-        uses: actions/upload-artifact@v4
-        with:
-          name: sql-dumps
-          path: data/generated/sql/*.sql.gz
-
-      - name: Upload CSV exports
-        uses: actions/upload-artifact@v4
-        with:
-          name: csv-exports
-          path: data/generated/csv/*.zip
-
-      - name: Upload PostgreSQL dumps
-        uses: actions/upload-artifact@v4
-        with:
-          name: postgres-dumps
-          path: data/generated/db/postgres
+            data/generated/sql/*.sql.gz
+            data/generated/csv/*.zip
+            data/generated/db/postgres/*
