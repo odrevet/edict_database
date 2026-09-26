@@ -3,10 +3,10 @@ description: convert edict xml to sql
 version: 0.0.3
 
 environment:
-  sdk: ^3.8.1
+  sdk: ^3.13.0
 
 dependencies:
-  xml: ^6.6.1
+  xml: ^7.0.1
 
 dev_dependencies:
-  lints: ^6.0.0
+  lints: ^6.1.0
