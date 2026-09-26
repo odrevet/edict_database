@@ -43,7 +43,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: sql-dumps
-          path: data/generated/sql/*.sql
+          path: data/generated/sql/*.sql.gz
 
       - name: Upload CSV exports
         uses: actions/upload-artifact@v4

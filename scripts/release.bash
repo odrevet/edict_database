@@ -38,11 +38,14 @@ build_sqlite() {
     bash scripts/sqlite.bash "$type" --clean --init --populate --compress "zip" --compress "xz"
 
     mkdir -p "$SQLITE_DIR"
-    mv "$RAW_DB_DIR/${type}.db" "$SQLITE_DIR/${type}${suffix}.db"
-    [[ -f "$RAW_DB_DIR/${type}.zip" ]] && mv "$RAW_DB_DIR/${type}.zip" "$SQLITE_DIR/${type}${suffix}.zip"
-    [[ -f "$RAW_DB_DIR/${type}.xz" ]] && mv "$RAW_DB_DIR/${type}.xz" "$SQLITE_DIR/${type}${suffix}.xz"
+    mv "$RAW_DB_DIR/${type}.db" "$SQLITE_DIR/sqlite_${type}${suffix}.db"
+    [[ -f "$RAW_DB_DIR/${type}.zip" ]] && mv "$RAW_DB_DIR/${type}.zip" "$SQLITE_DIR/sqlite_${type}${suffix}.zip"
+    [[ -f "$RAW_DB_DIR/${type}.xz" ]] && mv "$RAW_DB_DIR/${type}.xz" "$SQLITE_DIR/sqlite_${type}${suffix}.xz"
 
-    [[ -f "$SQL_DIR/${type}.sql" ]] && mv "$SQL_DIR/${type}.sql" "$SQL_DIR/${type}${suffix}.sql"
+    if [[ -f "$SQL_DIR/${type}.sql" ]]; then
+        mv "$SQL_DIR/${type}.sql" "$SQL_DIR/sql_${type}${suffix}.sql"
+        gzip -f "$SQL_DIR/sql_${type}${suffix}.sql"
+    fi
 }
 
 build_postgres() {
@@ -60,15 +63,18 @@ build_postgres() {
     if [[ -d "$CSV_DIR/${type}" ]]; then
         rm -rf "$CSV_DIR/${type}${suffix}"
         mv "$CSV_DIR/${type}" "$CSV_DIR/${type}${suffix}"
-        (cd "$CSV_DIR" && zip -rq "${type}${suffix}.zip" "${type}${suffix}")
+        (cd "$CSV_DIR" && zip -rq "csv_${type}${suffix}.zip" "${type}${suffix}")
         rm -rf "$CSV_DIR/${type}${suffix}"
     fi
 
     mkdir -p "$POSTGRES_DIR"
     docker exec -i "$POSTGRES_CONTAINER" pg_dump -U postgres -d "$POSTGRES_DB" --schema="$schema_name" -F p \
-        > "$POSTGRES_DIR/edict_${schema_name}.sql"
+        > "$POSTGRES_DIR/postgres_${schema_name}.sql"
+    gzip -f "$POSTGRES_DIR/postgres_${schema_name}.sql"
+
     docker exec -i "$POSTGRES_CONTAINER" pg_dump -U postgres -d "$POSTGRES_DB" --schema="$schema_name" -F c \
-        > "$POSTGRES_DIR/edict_${schema_name}.dump"
+        > "$POSTGRES_DIR/postgres_${schema_name}.dump"
+    gzip -f "$POSTGRES_DIR/postgres_${schema_name}.dump"
 }
 
 count_zip_csv_rows() {
@@ -95,26 +101,26 @@ generate_release_notes() {
         echo "- KANJIDIC2 version: $kanjidic_version, created: $kanjidic_date"
         echo ""
         echo "## Expression (all languages)"
-        echo "- Entries: $(count_zip_csv_rows "$CSV_DIR/expression_all.zip" entry.csv)"
-        echo "- Senses: $(count_zip_csv_rows "$CSV_DIR/expression_all.zip" sense.csv)"
-        echo "- Glosses: $(count_zip_csv_rows "$CSV_DIR/expression_all.zip" gloss.csv)"
+        echo "- Entries: $(count_zip_csv_rows "$CSV_DIR/csv_expression_all.zip" entry.csv)"
+        echo "- Senses: $(count_zip_csv_rows "$CSV_DIR/csv_expression_all.zip" sense.csv)"
+        echo "- Glosses: $(count_zip_csv_rows "$CSV_DIR/csv_expression_all.zip" gloss.csv)"
         echo ""
         echo "## Expression per language (glosses)"
         echo "| Language | Glosses |"
         echo "|---|---|"
         for lang in ${EXPRESSION_LANGS//,/ }; do
-            echo "| $lang | $(count_zip_csv_rows "$CSV_DIR/expression_${lang}.zip" gloss.csv) |"
+            echo "| $lang | $(count_zip_csv_rows "$CSV_DIR/csv_expression_${lang}.zip" gloss.csv) |"
         done
         echo ""
         echo "## Kanji (all languages)"
-        echo "- Characters: $(count_zip_csv_rows "$CSV_DIR/kanji_all.zip" character.csv)"
-        echo "- Meanings: $(count_zip_csv_rows "$CSV_DIR/kanji_all.zip" meaning.csv)"
+        echo "- Characters: $(count_zip_csv_rows "$CSV_DIR/csv_kanji_all.zip" character.csv)"
+        echo "- Meanings: $(count_zip_csv_rows "$CSV_DIR/csv_kanji_all.zip" meaning.csv)"
         echo ""
         echo "## Kanji per language (meanings)"
         echo "| Language | Meanings |"
         echo "|---|---|"
         for lang in ${KANJI_LANGS//,/ }; do
-            echo "| $lang | $(count_zip_csv_rows "$CSV_DIR/kanji_${lang}.zip" meaning.csv) |"
+            echo "| $lang | $(count_zip_csv_rows "$CSV_DIR/csv_kanji_${lang}.zip" meaning.csv) |"
         done
     } > "$RELEASE_NOTES"
 }

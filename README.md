@@ -117,6 +117,32 @@ bash scripts/run.bash expression --download
 bash scripts/run.bash kanji --download
 ```
 
+## scripts/release.bash
+
+Builds the full release: downloads sources, generates the global (all languages) and per-language SQLite databases, CSV exports and PostgreSQL dumps for both `expression` and `kanji`, then writes release notes.
+
+```bash
+bash scripts/release.bash
+```
+
+Generated files, all under `data/generated`:
+
+* `db/sqlite/sqlite_*.db`, `.zip`, `.xz`: SQLite databases, compressed variants
+* `sql/sql_*.sql.gz`: gzipped SQL insert scripts
+* `csv/csv_*.zip`: CSV exports
+* `db/postgres/postgres_*.sql.gz`, `.dump.gz`: gzipped PostgreSQL plain and custom-format dumps
+* `RELEASE.md`: release notes with source dates/versions and per-language row counts
+
+This is the script run by the `Release` GitHub Actions workflow (`workflow_dispatch`), which uploads each of these groups as separate artifacts.
+
+## scripts/test_db.bash
+
+Runs sanity checks against the generated SQLite databases and the PostgreSQL container, called automatically at the end of `release.bash`.
+
+```bash
+bash scripts/test_db.bash
+```
+
 ### sqlite 
 
 generate sql for english sense and populate the db and compress:
