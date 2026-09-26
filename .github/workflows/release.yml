@@ -1,0 +1,58 @@
+name: Release
+
+on:
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dart-lang/setup-dart@v1
+
+      - name: Install sqlite3
+        run: sudo apt-get update && sudo apt-get install -y sqlite3
+
+      - name: Install dart packages
+        run: dart pub get
+
+      - name: Run release
+        run: |
+          chmod +x scripts/release.bash
+          bash scripts/release.bash
+          cat data/generated/RELEASE.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload release notes
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-notes
+          path: data/generated/RELEASE.md
+
+      - name: Upload SQLite databases
+        uses: actions/upload-artifact@v4
+        with:
+          name: sqlite-databases
+          path: |
+            data/generated/db/sqlite/*.db
+            data/generated/db/sqlite/*.xz
+            data/generated/db/sqlite/*.zip
+
+      - name: Upload SQL dumps
+        uses: actions/upload-artifact@v4
+        with:
+          name: sql-dumps
+          path: data/generated/sql/*.sql
+
+      - name: Upload CSV exports
+        uses: actions/upload-artifact@v4
+        with:
+          name: csv-exports
+          path: data/generated/csv/*.zip
+
+      - name: Upload PostgreSQL dumps
+        uses: actions/upload-artifact@v4
+        with:
+          name: postgres-dumps
+          path: data/generated/db/postgres
