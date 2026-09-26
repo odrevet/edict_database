@@ -1,6 +1,6 @@
 name: edict_database
-description: convert edict xml to sql
-version: 0.0.3
+description: convert edict xml to sql for sqlite and postgres
+version: 0.0.5
 
 environment:
   sdk: ^3.13.0
