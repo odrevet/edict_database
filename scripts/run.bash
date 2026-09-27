@@ -6,7 +6,7 @@ usage() {
   echo "--download                    download JMdict (expression) or kanjidic2 (kanji)"
   echo "--sql [languages][maxinsert]  generate sql from downloaded dictionary."
   echo "--csv [languages]             generate csv from downloaded dictionary."
-  echo "--clean                       remove generated sql file"
+  echo "--clean                       remove generated sql file and csv directory"
 }
 
 subject=$1
@@ -81,6 +81,7 @@ while true; do
   --clean)
     shift
     rm -f "data/generated/sql/${subject}.sql"
+    rm -rf "data/generated/csv/${subject}"
     ;;
   *) break ;;
   esac

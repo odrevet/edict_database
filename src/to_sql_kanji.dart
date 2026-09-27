@@ -4,32 +4,31 @@ import 'common.dart';
 import 'parse_kanji.dart';
 
 void main(List<String> args) async {
-  // Parse named arguments
-  String langsArg = 'en'; // default
-  int maxInsert = 1; // default
+  String langsArg = 'en';
+  int maxInsert = 1;
+  bool usedNamedArgs = false;
 
   for (int i = 0; i < args.length; i++) {
     if (args[i] == '--langs' && i + 1 < args.length) {
       langsArg = args[i + 1];
+      usedNamedArgs = true;
       i++;
     } else if (args[i] == '--max-inserts' && i + 1 < args.length) {
       maxInsert = int.tryParse(args[i + 1]) ?? 1;
+      usedNamedArgs = true;
       i++;
     }
   }
 
-  // Parse comma-separated languages
   List<String> langs = langsArg.split(',').map((s) => s.trim()).toList();
 
-  // Check if last argument is a number (maxInsert parameter)
-  if (args.isNotEmpty && int.tryParse(args.last) != null) {
+  if (!usedNamedArgs && args.isNotEmpty && int.tryParse(args.last) != null) {
     maxInsert = int.parse(args.last);
     langs = args.sublist(0, args.length - 1);
   }
 
   final filename = 'data/generated/sql/kanji.sql';
 
-  // Parse kanji data from XML with escape function for SQL
   List<Kanji> kanjis = await parseKanjiXml(langs, escapeFunction: escape);
 
   final buffer = StringBuffer();
@@ -41,14 +40,12 @@ void main(List<String> args) async {
       [],
       maxInsert);
 
-  // Collect all values for batching
   List<List<dynamic>> allCharacterValues = [];
   List<List<dynamic>> allRadicalValues = [];
   List<List<dynamic>> allOnYomiValues = [];
   List<List<dynamic>> allKunYomiValues = [];
   List<List<dynamic>> allMeaningValues = [];
 
-  // Collect data from the List of Kanji
   for (var kanji in kanjis) {
     allCharacterValues.add(
         ["'${kanji.character}'", kanji.stroke, kanji.freq, kanji.jlpt]);
@@ -77,13 +74,12 @@ void main(List<String> args) async {
           "NULL",
           "'${kanji.character}'",
           "'${langs.indexOf(meaning.lang) + 1}'",
-          "'${meaning.meaning}'", // Already escaped by parseKanjiXml
+          "'${meaning.meaning}'",
         ]);
       }
     }
   }
 
-  // Write all batched inserts
   if (allCharacterValues.isNotEmpty) {
     addSqlInsertToBuffer(
         buffer, "character", allCharacterValues, [], maxInsert);
