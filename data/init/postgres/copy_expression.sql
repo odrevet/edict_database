@@ -1,3 +1,6 @@
+-- gloss table may have a lot of rows, disable timeout
+SET statement_timeout = 0;
+
 -- Import entity tables first (they're referenced by other tables)
 \copy expression.lang FROM 'data/generated/csv/expression/lang.csv' WITH (FORMAT csv, HEADER true);
 \copy expression.dial FROM 'data/generated/csv/expression/dial.csv' WITH (FORMAT csv, HEADER true);
