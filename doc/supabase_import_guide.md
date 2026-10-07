@@ -88,15 +88,6 @@ Without the service file, the same connection with flags:
 psql -h aws-0-<REGION>.pooler.supabase.com -p 5432 -U postgres.<PROJECT_REF> -d postgres
 ```
 
-## Create the tables
-
-```bash
-psql service=edict -v ON_ERROR_STOP=1 -f data/init/postgres/expression.sql
-psql service=edict -v ON_ERROR_STOP=1 -f data/init/postgres/kanji.sql
-```
-
-Alternative: paste the SQL in the dashboard SQL Editor.
-
 ## Extract the generated CSV archives
 
 The generated CSV files are shipped zipped. Extract the archive as the `expression` folder, because the import script reads `data/generated/csv/expression/*.csv`.
@@ -106,6 +97,18 @@ Two archives exist (use only one):
 - `csv_expression_eng.zip`: English only
 
 Run these commands from the project root. The archives are in `data/generated/csv/`.
+
+## Create the tables
+
+Note: we are generating csv data before create table because the kanji init script 
+also rely on generated csv data mid-creation, as some radicals inserted as characters
+need to be referenced.
+
+```bash
+psql service=edict -v ON_ERROR_STOP=1 -f data/init/postgres/expression.sql
+psql service=edict -v ON_ERROR_STOP=1 -f data/init/postgres/kanji.sql
+```
+
 
 ```bash
 # all languages
