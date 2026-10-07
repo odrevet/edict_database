@@ -171,6 +171,11 @@ GRANT USAGE ON SCHEMA expression TO anon, authenticated;
 GRANT SELECT ON ALL TABLES IN SCHEMA expression TO anon, authenticated;
 ```
 
+```sql
+GRANT USAGE ON SCHEMA kanji TO anon, authenticated;
+GRANT SELECT ON ALL TABLES IN SCHEMA kanji TO anon, authenticated;
+```
+
 - Row Level Security: enable it on each table and add policies, otherwise the `anon` key sees nothing (RLS on, no policy) or everything (RLS off).
 - Endpoint: `https://<PROJECT_REF>.supabase.co/rest/v1/<table>`
 - Headers: `apikey: <ANON_KEY>` (and `Accept-Profile: expression` to target a non-public schema).
