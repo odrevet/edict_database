@@ -34,17 +34,9 @@ pg_restore --version
 
 ## Configure the connection
 
-### environment variables (current terminal only)
+Two files in your home directory: `~/.pgpass` stores the password, `~/.pg_service.conf` stores the connection parameters under a name. Together they make a plain `psql` work from any terminal, with no `export` and no password on the command line.
 
-```bash
-export PGHOST=aws-0-<REGION>.pooler.supabase.com
-export PGPORT=5432
-export PGDATABASE=postgres
-export PGUSER=postgres.<PROJECT_REF>
-export PGPASSWORD='<PASSWORD>'
-```
-
-### Option B: `~/.pgpass` (persistent, password not in shell history)
+### `~/.pgpass` (password)
 
 Format, one line per connection:
 
@@ -59,6 +51,39 @@ EOF
 chmod 600 ~/.pgpass     # required, otherwise ignored
 ```
 
+psql uses the first line matching the host, port, database and user of the connection. `*` is a wildcard, and a literal `:` or `\` in a field must be escaped with a backslash. One line per instance if you have several.
+
+### `~/.pg_service.conf` (host, port, user, database)
+
+```bash
+cat > ~/.pg_service.conf <<'EOF'
+[edict]
+host=aws-0-<REGION>.pooler.supabase.com
+port=5432
+dbname=postgres
+user=postgres.<PROJECT_REF>
+EOF
+```
+
+Do not put the password here, `~/.pgpass` supplies it.
+
+Use the service by name:
+
+```bash
+psql service=edict -c "\conninfo"
+```
+
+Or make it the default for every terminal, so that a plain `psql` targets Supabase:
+
+```bash
+echo 'export PGSERVICE=edict' >> ~/.bashrc    # or ~/.zshrc
+source ~/.bashrc
+```
+
+Several databases: add one section per instance (`[local]`, `[other-project]`, ...) and choose with `psql service=<name>`.
+
+Without the service file, the same connection with flags:
+
 ```bash
 psql -h aws-0-<REGION>.pooler.supabase.com -p 5432 -U postgres.<PROJECT_REF> -d postgres
 ```
@@ -66,8 +91,8 @@ psql -h aws-0-<REGION>.pooler.supabase.com -p 5432 -U postgres.<PROJECT_REF> -d 
 ## Create the tables
 
 ```bash
-psql -v ON_ERROR_STOP=1 -f data/init/postgres/expression.sql
-psql -v ON_ERROR_STOP=1 -f data/init/postgres/kanji.sql
+psql service=edict -v ON_ERROR_STOP=1 -f data/init/postgres/expression.sql
+psql service=edict -v ON_ERROR_STOP=1 -f data/init/postgres/kanji.sql
 ```
 
 Alternative: paste the SQL in the dashboard SQL Editor.
@@ -96,7 +121,8 @@ ls data/generated/csv/expression   # should list entry.csv, gloss.csv, k_ele.csv
 ## Import CSV files
 
 ```bash
-psql -v ON_ERROR_STOP=1 -f data/init/postgres/copy_expression.sql
+psql service=edict -v ON_ERROR_STOP=1 -f data/init/postgres/copy_expression.sql
+psql service=edict -v ON_ERROR_STOP=1 -f data/init/postgres/copy_kanji.sql
 ```
 
 ## Reset the tables (start over)
@@ -106,12 +132,30 @@ If an import fails halfway, or you want to reload everything, empty the tables f
 Check which database you are connected to before any destructive command:
 
 ```bash
-psql -c "\conninfo"
+psql service=edict -c "\conninfo"
 ```
 
 Empty every table of the `expression` schema
 ```bash
-psql -c "DO \$\$ DECLARE r record; BEGIN FOR r IN SELECT tablename FROM pg_tables WHERE schemaname='expression' LOOP EXECUTE format('TRUNCATE TABLE expression.%I RESTART IDENTITY CASCADE', r.tablename); END LOOP; END \$\$;"
+psql service=edict -c "DO \$\$ DECLARE r record; BEGIN FOR r IN SELECT tablename FROM pg_tables WHERE schemaname='expression' LOOP EXECUTE format('TRUNCATE TABLE expression.%I RESTART IDENTITY CASCADE', r.tablename); END LOOP; END \$\$;"
+```
+
+## Activate RLS, enable read only
+
+```sql
+DO $$
+DECLARE r record;
+BEGIN
+  FOR r IN SELECT schemaname, tablename FROM pg_tables WHERE schemaname IN ('expression', 'kanji')
+  LOOP
+    EXECUTE format('ALTER TABLE %I.%I ENABLE ROW LEVEL SECURITY', r.schemaname, r.tablename);
+    EXECUTE format('DROP POLICY IF EXISTS "public read" ON %I.%I', r.schemaname, r.tablename);
+    EXECUTE format('CREATE POLICY "public read" ON %I.%I FOR SELECT TO anon, authenticated USING (true)', r.schemaname, r.tablename);
+  END LOOP;
+END $$;
+
+REVOKE INSERT, UPDATE, DELETE, TRUNCATE ON ALL TABLES IN SCHEMA expression FROM anon, authenticated;
+REVOKE INSERT, UPDATE, DELETE, TRUNCATE ON ALL TABLES IN SCHEMA kanji FROM anon, authenticated;
 ```
 
 ## Expose the data through the REST API
