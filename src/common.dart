@@ -2,6 +2,26 @@ String escape(String value) {
   return value.replaceAll('\'', '\'\'');
 }
 
+String escapeCsv(String value) {
+  if (value.contains(',') || value.contains('"') || value.contains('\n')) {
+    return '"${value.replaceAll('"', '""')}"';
+  }
+  return value;
+}
+
+String formatCsvValue(dynamic value) {
+  if (value == null || value == 'NULL') {
+    return '';
+  }
+
+  String str = value.toString();
+  if (str.startsWith("'") && str.endsWith("'")) {
+    str = str.substring(1, str.length - 1);
+  }
+
+  return escapeCsv(str);
+}
+
 void addSqlInsertToBuffer(
     StringBuffer buffer,
     String tableName,

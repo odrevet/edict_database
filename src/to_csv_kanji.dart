@@ -1,25 +1,7 @@
 import 'dart:io';
 
+import 'common.dart';
 import 'parse_kanji.dart';
-
-String escapeCsv(String value) {
-  // Always wrap in quotes and escape internal quotes by doubling them
-  return '"${value.replaceAll('"', '""')}"';
-}
-
-String formatCsvValue(dynamic value) {
-  if (value == null || value == 'NULL') {
-    return '';
-  }
-
-  String str = value.toString();
-  // Remove surrounding quotes if present (from SQL format)
-  if (str.startsWith("'") && str.endsWith("'")) {
-    str = str.substring(1, str.length - 1);
-  }
-
-  return escapeCsv(str);
-}
 
 String formatCsvNumber(dynamic value) {
   if (value == null || value == 'NULL') {

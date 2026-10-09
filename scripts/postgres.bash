@@ -6,6 +6,7 @@ usage() {
   echo "--init               create db tables"
   echo "--populate           populate db file from generated sql"
   echo "--clean              wipe database"
+  echo "--psql-args <args>   extra arguments passed to psql (e.g. service=edict)"
 }
 
 subject=$1
@@ -26,16 +27,20 @@ while true; do
   echo $action
   case "$2" in
   --init)
-    psql -U postgres -d edict < data/init/postgres/${subject}.sql
+    psql $PSQL_ARGS -U postgres -d edict < data/init/postgres/${subject}.sql
     shift
     ;;
   --populate)
-    psql -U postgres -d edict < data/init/postgres/copy_${subject}.sql
+    psql $PSQL_ARGS -U postgres -d edict < data/init/postgres/copy_${subject}.sql
     shift
     ;;
   --clean)
-    psql -U postgres -d edict -c "DROP SCHEMA ${subject} CASCADE; CREATE SCHEMA ${subject};"
+    psql $PSQL_ARGS -U postgres -d edict -c "DROP SCHEMA ${subject} CASCADE; CREATE SCHEMA ${subject};"
     shift
+    ;;
+  --psql-args)
+    PSQL_ARGS=$3
+    shift 2
     ;;
   *) break ;;
   esac

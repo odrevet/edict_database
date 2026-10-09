@@ -99,7 +99,7 @@ sudo apt install sqlite3
 * `--compress`: Compress the SQLite database
 * `--clean`: Remove the database
 
-## scripts/postgres.sh
+## scripts/postgres.bash
 
 
 Postgres database is populated using `psql`.
@@ -107,8 +107,13 @@ Postgres database is populated using `psql`.
 * `--init`: Create PostgreSQL database with tables and indexes
 * `--populate`: Import data using previously generated CSV files via COPY
 * `--clean`: Remove the database
+* `--psql-args <args>`: Extra arguments passed to every `psql` invocation (e.g. `service=edict`)
 
-## Helper scripts examples 
+```bash
+bash scripts/postgres.bash expression --psql-args "service=edict" --init --populate
+```
+
+# Helper scripts examples 
 
 First download the dictionaries
 
@@ -143,7 +148,7 @@ Runs sanity checks against the generated SQLite databases and the PostgreSQL con
 bash scripts/test_db.bash
 ```
 
-### sqlite 
+## sqlite 
 
 generate sql for english sense and populate the db and compress:
 
@@ -161,7 +166,7 @@ bash scripts/run.bash kanji --clean --init --sql "en"
 bash scripts/sqlite.bash kanji --populate --compress "zip" --compress "xz"
 ```
 
-### postgres using docker
+## postgres using docker
 
 * Create a container
 
@@ -210,6 +215,8 @@ docker exec -it -w /workspace postgres-container psql -U postgres -d edict
 # Documentation
 
 For more information onto the database structure and SQL recipes see the Wiki at https://github.com/odrevet/edict_database/wiki
+
+and under the `doc` directory 
 
 # Licencing
 
