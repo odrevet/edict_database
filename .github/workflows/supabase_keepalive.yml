@@ -1,0 +1,21 @@
+name: Supabase keepalive
+
+on:
+  schedule:
+    - cron: "0 6 */3 * *"   # every 3 days at 6am UTC
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Query Supabase
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+        run: |
+          curl --fail --silent --show-error \
+            "$SUPABASE_URL/rest/v1/gloss?select=*&limit=1" \
+            -H "apikey: $SUPABASE_KEY" \
+            -H "Accept-Profile: expression" \
+            -o /dev/null
